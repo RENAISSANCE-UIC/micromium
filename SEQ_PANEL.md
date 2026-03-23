@@ -14,7 +14,7 @@ A persistent status bar below the sequence panel that reflects the current selec
 This is the first deliverable because every subsequent feature (copy, stats, jump) reads
 from selection state — it must be reliable before building on top of it.
 
-### S1a — HUD scaffold ✅ TODO
+### S1a — HUD scaffold ✅ DONE
 Add a thin fixed bar at the bottom of the SeqView container. Reads `selection` from
 `useSelection`. Shows placeholder text when nothing is selected.
 

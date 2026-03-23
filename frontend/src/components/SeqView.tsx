@@ -330,6 +330,49 @@ function Row({ index, style, data }: ListChildComponentProps<RowData>) {
   )
 }
 
+// --- SelectionHUD ---
+
+function SelectionHUD({ selection }: { selection: import('../types').SelectionDTO | null }) {
+  const hasSelection = selection && selection.start >= 0 && selection.end > selection.start
+
+  return (
+    <div style={hudStyle}>
+      {hasSelection ? (
+        <span>
+          <span style={hudLabelStyle}>pos </span>
+          <span style={hudValueStyle}>{selection.start + 1}–{selection.end}</span>
+          <span style={hudSepStyle}> | </span>
+          <span style={hudValueStyle}>{selection.end - selection.start} bp</span>
+          <span style={hudSepStyle}> | </span>
+          <span style={hudLabelStyle}>GC </span>
+          <span style={hudValueStyle}>—</span>
+          <span style={hudSepStyle}> | </span>
+          <span style={hudLabelStyle}>Tm </span>
+          <span style={hudValueStyle}>—</span>
+        </span>
+      ) : (
+        <span style={{ color: '#aaa' }}>No selection</span>
+      )}
+    </div>
+  )
+}
+
+const hudStyle: React.CSSProperties = {
+  flexShrink: 0,
+  height: 26,
+  display: 'flex',
+  alignItems: 'center',
+  paddingLeft: 10,
+  fontSize: 11,
+  fontFamily: 'monospace',
+  background: '#f5f5f5',
+  borderTop: '1px solid #d0d0d0',
+  userSelect: 'none',
+}
+const hudLabelStyle: React.CSSProperties = { color: '#999' }
+const hudValueStyle: React.CSSProperties = { color: '#222' }
+const hudSepStyle:   React.CSSProperties = { color: '#ccc' }
+
 // --- SeqView ---
 
 interface SeqViewProps {
@@ -380,19 +423,22 @@ export function SeqView({ doc }: SeqViewProps) {
   }, [doc.bases.length, publish])
 
   return (
-    <div ref={containerRef} style={{ height: '100%', width: '100%' }} onClick={handleClick}>
-      {height > 0 && (
-        <VariableSizeList
-          ref={listRef}
-          height={height}
-          width={width}
-          itemCount={lineCount}
-          itemSize={(i) => lineRowHeight(lineLayouts[i] ?? { fwdTracks: [], revTracks: [], fwdLayerCount: 0, revLayerCount: 0 })}
-          itemData={itemData}
-        >
-          {Row}
-        </VariableSizeList>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+      <div ref={containerRef} style={{ flex: 1, overflow: 'hidden' }} onClick={handleClick}>
+        {height > 0 && (
+          <VariableSizeList
+            ref={listRef}
+            height={height}
+            width={width}
+            itemCount={lineCount}
+            itemSize={(i) => lineRowHeight(lineLayouts[i] ?? { fwdTracks: [], revTracks: [], fwdLayerCount: 0, revLayerCount: 0 })}
+            itemData={itemData}
+          >
+            {Row}
+          </VariableSizeList>
+        )}
+      </div>
+      <SelectionHUD selection={selection} />
     </div>
   )
 }

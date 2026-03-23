@@ -13,7 +13,7 @@ const STRAND_SEP     = 4    // px
 const ARROW_TIP      = 7    // px
 const GUTTER_W       = '7ch'
 const GUTTER_MX      = 8    // px
-const MAX_BP         = 900
+const MAX_BP         = 10_000
 
 // ---- Complement ----------------------------------------------------------
 const COMPLEMENT: Record<string, string> = {
@@ -296,6 +296,7 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
         padding:   '4px 14px 8px',
         fontFamily: 'monospace',
         fontSize:   12,
+        minHeight:  0,
       }}>
         {loading ? (
           <span style={{ color: '#aaa' }}>Loading…</span>
@@ -376,6 +377,33 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
             </div>
           )
         })}
+      </div>
+
+      {/* HUD */}
+      <div style={{
+        flexShrink: 0, height: 26,
+        display: 'flex', alignItems: 'center', paddingLeft: 10,
+        fontSize: 11, fontFamily: 'monospace',
+        background: '#f5f5f5', borderTop: '1px solid #d0d0d0',
+        userSelect: 'none',
+      }}>
+        {state ? (
+          <span>
+            <span style={{ color: '#999' }}>pos </span>
+            <span style={{ color: '#222' }}>{state.gStart + 1}–{state.gEnd}</span>
+            <span style={{ color: '#ccc' }}> | </span>
+            <span style={{ color: '#222' }}>{state.gEnd - state.gStart} bp</span>
+            {state.truncated && <span style={{ color: '#aaa', marginLeft: 6 }}>(truncated)</span>}
+            <span style={{ color: '#ccc' }}> | </span>
+            <span style={{ color: '#999' }}>GC </span>
+            <span style={{ color: '#222' }}>—</span>
+            <span style={{ color: '#ccc' }}> | </span>
+            <span style={{ color: '#999' }}>Tm </span>
+            <span style={{ color: '#222' }}>—</span>
+          </span>
+        ) : (
+          <span style={{ color: '#aaa' }}>No selection</span>
+        )}
       </div>
     </div>
   )
