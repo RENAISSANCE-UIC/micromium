@@ -1,0 +1,14 @@
+# Go build output
+micromium
+micromiumserver
+*.exe
+
+# Electron / Node build output
+frontend/dist-electron/
+frontend/node_modules/
+frontend/dist/
+frontend/electron/dist/
+
+# OS noise
+.DS_Store
+Thumbs.db

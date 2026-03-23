@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "electron/dist",
+    "types": ["node", "electron"]
+  },
+  "include": ["electron/**/*.ts"]
+}
