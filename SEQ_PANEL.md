@@ -26,7 +26,7 @@ Add a thin fixed bar at the bottom of the SeqView container. Reads `selection` f
 **Acceptance:** open `pSB1C3.gb`, click any feature arc → HUD updates with correct
 length and coordinates. Click empty space → HUD resets to "No selection."
 
-### S1b — GC% calculation ✅ TODO
+### S1b — GC% calculation ✅ DONE
 Compute GC% for `doc.bases.slice(selection.start, selection.end)`.
 
 - Formula: `(G + C) / length * 100`, rounded to one decimal
@@ -35,7 +35,7 @@ Compute GC% for `doc.bases.slice(selection.start, selection.end)`.
 **Acceptance:** select the full `pSB1C3.gb` sequence (2070 bp). GC% should match
 the value reported by ApE or a known-good reference tool.
 
-### S1c — Tm calculation ✅ TODO
+### S1c — Tm calculation ✅ DONE
 Basic Wallace rule for short sequences (< 14 bp); salt-adjusted nearest-neighbour
 approximation for longer ones is Phase S2. For now:
 
@@ -52,7 +52,7 @@ a reference calculator (e.g., Thermo or NEB Tm tool).
 
 Builds directly on the HUD selection state. No new state needed.
 
-### S2a — Copy as FASTA ✅ TODO
+### S2a — Copy as FASTA ✅ DONE
 Button in the HUD: `Copy FASTA`. Writes to clipboard:
 
 ```
@@ -67,7 +67,7 @@ ATCG...
 **Acceptance:** select a feature, click Copy FASTA, paste into a text editor —
 verify header coordinates and sequence are correct.
 
-### S2b — Copy reverse complement ✅ TODO
+### S2b — Copy reverse complement ✅ DONE
 Second button in the HUD: `Copy RC`. Writes reverse complement of the selection
 in FASTA format with header `>rc:START-END`.
 

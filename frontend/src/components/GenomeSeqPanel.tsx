@@ -15,6 +15,48 @@ const GUTTER_W       = '7ch'
 const GUTTER_MX      = 8    // px
 const MAX_BP         = 10_000
 
+// ---- Sequence utilities --------------------------------------------------
+function reverseComplement(seq: string): string {
+  return Array.from(seq).reverse().map(b => COMPLEMENT[b] ?? b).join('')
+}
+
+function wrapSeq(seq: string, width = 60): string {
+  const lines: string[] = []
+  for (let i = 0; i < seq.length; i += width) lines.push(seq.slice(i, i + width))
+  return lines.join('\n')
+}
+
+function downloadFasta(filename: string, text: string) {
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+
+// ---- GC% -----------------------------------------------------------------
+function gcPercent(seq: string): string {
+  if (seq.length === 0) return '—'
+  let gc = 0
+  for (const b of seq) { if (b === 'G' || b === 'C' || b === 'g' || b === 'c') gc++ }
+  return (gc / seq.length * 100).toFixed(1) + '%'
+}
+
+function tmCelsius(seq: string): string {
+  const len = seq.length
+  if (len < 6) return '—'
+  let gc = 0, at = 0
+  for (const b of seq) {
+    const u = b.toUpperCase()
+    if (u === 'G' || u === 'C') gc++
+    else if (u === 'A' || u === 'T') at++
+  }
+  const tm = len <= 13
+    ? 2 * at + 4 * gc
+    : 64.9 + 41 * (gc - 16.4) / len
+  return tm.toFixed(1) + '°C'
+}
+
 // ---- Complement ----------------------------------------------------------
 const COMPLEMENT: Record<string, string> = {
   A: 'T', T: 'A', G: 'C', C: 'G',
@@ -208,7 +250,9 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
     label:     string
     span:      string
   } | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const [senseMode, setSenseMode] = useState(true)
+  const [copied, setCopied]       = useState(false)
 
   useEffect(() => {
     if (!selection || selection.start < 0 || !selection.featureId) {
@@ -233,6 +277,32 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
       })
       .catch(() => setLoading(false))
   }, [selection, doc])
+
+  // Reset orientation when feature changes
+  useEffect(() => { setSenseMode(true); setCopied(false) }, [state?.featId])
+
+  // Derive export sequence: RC for reverse-strand features in sense mode
+  const feat      = state ? doc.features.find(f => f.id === state.featId) ?? null : null
+  const isReverse = feat?.direction === 'reverse'
+  const exportBases = (senseMode && isReverse) ? reverseComplement(state?.bases ?? '') : (state?.bases ?? '')
+  const fastaCoords = (isReverse && senseMode)
+    ? `complement(${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0})`
+    : `${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0}`
+  const fastaStr = state
+    ? `>${state.label} ${fastaCoords} [${doc.name}]\n${wrapSeq(exportBases)}\n`
+    : ''
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fastaStr).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
+
+  const handleDownload = () => {
+    if (!state) return
+    downloadFasta(`${state.label}.fasta`, fastaStr)
+  }
 
   const layouts = useMemo(() => {
     if (!state) return []
@@ -273,17 +343,37 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
       minHeight:  alwaysShow ? 0 : undefined,
       overflow:   alwaysShow ? 'hidden' : undefined,
     }}>
-      {/* Header: feature name + span */}
+      {/* Header: feature name + span + export controls */}
       {state && (
         <div style={{
-          padding: '4px 14px 2px',
-          fontSize: 12, color: '#555', fontFamily: 'monospace',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '4px 10px 4px 14px', borderBottom: '1px solid #e8e8e8',
+          flexShrink: 0,
         }}>
-          <strong style={{ color: '#1a1a1a' }}>{state.label}</strong>
-          {'  '}{state.span}
-          {state.truncated && (
-            <span style={{ color: '#aaa', marginLeft: 8 }}>(first {MAX_BP} bp shown)</span>
-          )}
+          <span style={{ fontSize: 12, color: '#555', fontFamily: 'monospace' }}>
+            <strong style={{ color: '#1a1a1a' }}>{state.label}</strong>
+            {'  '}{state.span}
+            {state.truncated && <span style={{ color: '#aaa', marginLeft: 8 }}>(truncated)</span>}
+          </span>
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
+            {isReverse && (
+              <button
+                onClick={() => setSenseMode(m => !m)}
+                title={senseMode
+                  ? 'Exporting sense strand (RC of genomic). Click to export raw genomic strand.'
+                  : 'Exporting raw genomic strand. Click to export sense strand (RC).'}
+                style={{ ...exportBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
+              >
+                {senseMode ? '5′→3′ sense' : '3′→5′ raw'}
+              </button>
+            )}
+            <button onClick={handleCopy} style={exportBtnStyle}>
+              {copied ? 'Copied ✓' : 'Copy FASTA'}
+            </button>
+            <button onClick={handleDownload} style={exportBtnStyle}>
+              ↓ .fasta
+            </button>
+          </div>
         </div>
       )}
 
@@ -396,10 +486,10 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
             {state.truncated && <span style={{ color: '#aaa', marginLeft: 6 }}>(truncated)</span>}
             <span style={{ color: '#ccc' }}> | </span>
             <span style={{ color: '#999' }}>GC </span>
-            <span style={{ color: '#222' }}>—</span>
+            <span style={{ color: '#222' }}>{gcPercent(state.bases)}</span>
             <span style={{ color: '#ccc' }}> | </span>
             <span style={{ color: '#999' }}>Tm </span>
-            <span style={{ color: '#222' }}>—</span>
+            <span style={{ color: '#222' }}>{tmCelsius(state.bases)}</span>
           </span>
         ) : (
           <span style={{ color: '#aaa' }}>No selection</span>
@@ -407,4 +497,10 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
       </div>
     </div>
   )
+}
+
+const exportBtnStyle: React.CSSProperties = {
+  padding: '2px 7px', fontSize: 11, borderRadius: 3,
+  border: '1px solid #ccc', background: '#fff',
+  cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
 }

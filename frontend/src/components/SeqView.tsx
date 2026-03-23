@@ -332,24 +332,121 @@ function Row({ index, style, data }: ListChildComponentProps<RowData>) {
 
 // --- SelectionHUD ---
 
-function SelectionHUD({ selection }: { selection: import('../types').SelectionDTO | null }) {
-  const hasSelection = selection && selection.start >= 0 && selection.end > selection.start
+function gcPercent(seq: string): string {
+  if (seq.length === 0) return '—'
+  let gc = 0
+  for (const b of seq) { if (b === 'G' || b === 'C' || b === 'g' || b === 'c') gc++ }
+  return (gc / seq.length * 100).toFixed(1) + '%'
+}
+
+function tmCelsius(seq: string): string {
+  const len = seq.length
+  if (len < 6) return '—'
+  let gc = 0, at = 0
+  for (const b of seq) {
+    const u = b.toUpperCase()
+    if (u === 'G' || u === 'C') gc++
+    else if (u === 'A' || u === 'T') at++
+  }
+  const tm = len <= 13
+    ? 2 * at + 4 * gc
+    : 64.9 + 41 * (gc - 16.4) / len
+  return tm.toFixed(1) + '°C'
+}
+
+function reverseComplement(seq: string): string {
+  return Array.from(seq).reverse().map(b => COMPLEMENT[b] ?? b).join('')
+}
+
+function wrapSeq(seq: string, width = 60): string {
+  const lines: string[] = []
+  for (let i = 0; i < seq.length; i += width) lines.push(seq.slice(i, i + width))
+  return lines.join('\n')
+}
+
+function downloadFasta(filename: string, text: string) {
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+
+function SelectionHUD({ selection, bases, features }: {
+  selection: import('../types').SelectionDTO | null
+  bases:     string
+  features:  import('../types').FeatureDTO[]
+}) {
+  const [senseMode, setSenseMode] = useState(true)
+  const [copied,    setCopied]    = useState(false)
+
+  // Reset when selection changes
+  useEffect(() => { setSenseMode(true); setCopied(false) }, [selection?.featureId])
+
+  const hasSelection = !!(selection && selection.start >= 0 && selection.end > selection.start)
+  const feat      = hasSelection && selection!.featureId
+    ? features.find(f => f.id === selection!.featureId) ?? null
+    : null
+  const isReverse = feat?.direction === 'reverse'
+  const rawSlice  = hasSelection ? bases.slice(selection!.start, selection!.end) : ''
+  const exportSeq = (senseMode && isReverse) ? reverseComplement(rawSlice) : rawSlice
+  const gc = hasSelection ? gcPercent(rawSlice) : '—'
+  const tm = hasSelection ? tmCelsius(rawSlice)  : '—'
+
+  const fastaLabel = feat
+    ? (isReverse && senseMode
+        ? `complement(${selection!.start + 1}..${selection!.end})`
+        : `${selection!.start + 1}..${selection!.end}`)
+    : `${(selection?.start ?? 0) + 1}..${selection?.end ?? 0}`
+  const fastaName = feat?.label ?? 'selection'
+  const fastaStr  = `>${fastaName} ${fastaLabel}\n${wrapSeq(exportSeq)}\n`
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fastaStr).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
 
   return (
     <div style={hudStyle}>
       {hasSelection ? (
-        <span>
-          <span style={hudLabelStyle}>pos </span>
-          <span style={hudValueStyle}>{selection.start + 1}–{selection.end}</span>
-          <span style={hudSepStyle}> | </span>
-          <span style={hudValueStyle}>{selection.end - selection.start} bp</span>
-          <span style={hudSepStyle}> | </span>
-          <span style={hudLabelStyle}>GC </span>
-          <span style={hudValueStyle}>—</span>
-          <span style={hudSepStyle}> | </span>
-          <span style={hudLabelStyle}>Tm </span>
-          <span style={hudValueStyle}>—</span>
-        </span>
+        <>
+          <span style={{ flex: 1 }}>
+            <span style={hudLabelStyle}>pos </span>
+            <span style={hudValueStyle}>{selection!.start + 1}–{selection!.end}</span>
+            <span style={hudSepStyle}> | </span>
+            <span style={hudValueStyle}>{selection!.end - selection!.start} bp</span>
+            <span style={hudSepStyle}> | </span>
+            <span style={hudLabelStyle}>GC </span>
+            <span style={hudValueStyle}>{gc}</span>
+            <span style={hudSepStyle}> | </span>
+            <span style={hudLabelStyle}>Tm </span>
+            <span style={hudValueStyle}>{tm}</span>
+          </span>
+          <div style={{ display: 'flex', gap: 4, paddingRight: 6 }}>
+            {isReverse && (
+              <button
+                onClick={() => setSenseMode(m => !m)}
+                title={senseMode
+                  ? 'Exporting sense strand (RC). Click for raw genomic.'
+                  : 'Exporting raw genomic strand. Click for sense.'}
+                style={{ ...hudBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
+              >
+                {senseMode ? '5′→3′ sense' : '3′→5′ raw'}
+              </button>
+            )}
+            <button onClick={handleCopy} style={hudBtnStyle}>
+              {copied ? 'Copied ✓' : 'Copy FASTA'}
+            </button>
+            <button
+              onClick={() => downloadFasta(`${fastaName}.fasta`, fastaStr)}
+              style={hudBtnStyle}
+            >
+              ↓ .fasta
+            </button>
+          </div>
+        </>
       ) : (
         <span style={{ color: '#aaa' }}>No selection</span>
       )}
@@ -372,6 +469,11 @@ const hudStyle: React.CSSProperties = {
 const hudLabelStyle: React.CSSProperties = { color: '#999' }
 const hudValueStyle: React.CSSProperties = { color: '#222' }
 const hudSepStyle:   React.CSSProperties = { color: '#ccc' }
+const hudBtnStyle:   React.CSSProperties = {
+  padding: '1px 6px', fontSize: 10, borderRadius: 3,
+  border: '1px solid #ccc', background: '#fff',
+  cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
+}
 
 // --- SeqView ---
 
@@ -438,7 +540,7 @@ export function SeqView({ doc }: SeqViewProps) {
           </VariableSizeList>
         )}
       </div>
-      <SelectionHUD selection={selection} />
+      <SelectionHUD selection={selection} bases={doc.bases} features={doc.features} />
     </div>
   )
 }
