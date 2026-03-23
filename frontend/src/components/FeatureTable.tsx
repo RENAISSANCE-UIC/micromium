@@ -44,12 +44,21 @@ export function FeatureTable({ doc }: FeatureTableProps) {
   const { selection, publish } = useSelection('featuretable')
   const [sortKey, setSortKey] = useState<SortKey>('start')
   const [sortAsc, setSortAsc] = useState(true)
+  const [query, setQuery] = useState('')
   const selectedRowRef = useRef<HTMLTableRowElement>(null)
 
   const sorted = useMemo(
     () => sortFeatures(doc.features, sortKey, sortAsc),
     [doc.features, sortKey, sortAsc],
   )
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return sorted
+    return sorted.filter(f =>
+      f.label.toLowerCase().includes(q) || f.type.toLowerCase().includes(q)
+    )
+  }, [sorted, query])
 
   // Scroll the selected row into view when selection changes.
   useEffect(() => {
@@ -70,7 +79,22 @@ export function FeatureTable({ doc }: FeatureTableProps) {
   }, [publish])
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={searchBarStyle}>
+        <input
+          type="search"
+          placeholder="Search name or type…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          style={searchInputStyle}
+        />
+        {query && (
+          <span style={{ fontSize: 11, color: '#999', whiteSpace: 'nowrap' }}>
+            {filtered.length} / {doc.features.length}
+          </span>
+        )}
+      </div>
+      <div style={{ overflowY: 'auto', flex: 1 }}>
       <table style={tableStyle}>
         <thead>
           <tr>
@@ -93,7 +117,7 @@ export function FeatureTable({ doc }: FeatureTableProps) {
           </tr>
         </thead>
         <tbody>
-          {sorted.map(feat => {
+          {filtered.map(feat => {
             const isSelected = selection?.featureId === feat.id
             const fwdColor = feat.direction === 'reverse' ? feat.revColor : feat.fwdColor
             return (
@@ -125,6 +149,7 @@ export function FeatureTable({ doc }: FeatureTableProps) {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
@@ -140,4 +165,13 @@ const thStyle: React.CSSProperties = {
 }
 const tdStyle: React.CSSProperties = {
   padding: '3px 8px', borderBottom: '1px solid #ebebeb',
+}
+const searchBarStyle: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 8,
+  padding: '6px 8px', borderBottom: '1px solid #d0d0d0',
+  background: '#f5f5f5', flexShrink: 0,
+}
+const searchInputStyle: React.CSSProperties = {
+  flex: 1, fontSize: 12, padding: '3px 6px',
+  border: '1px solid #ccc', borderRadius: 3, outline: 'none',
 }
