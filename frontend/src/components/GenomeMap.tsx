@@ -154,16 +154,22 @@ export function GenomeMap({ doc }: GenomeMapProps) {
     viewerRef.current = viewer
   }, [doc, publish])
 
-  // ---- Receive selection → refresh CGView (keep current pan/zoom) ----------
-  // NOTE: We intentionally do NOT call cgv.zoomTo() here — changing the zoom
-  // level on a multi-Mbp genome can make the ring invisible (zoom=1 maps each
-  // bp to a sub-pixel, collapsing the canvas to blank).  We just redraw to
-  // reflect any state changes; the user navigates the map manually.
+  // ---- Receive selection → zoom to feature ---------------------------------
   useEffect(() => {
     const cgv = viewerRef.current
     if (!cgv || !selection) return
-    try { cgv.draw() } catch (_) { /* silent */ }
-  }, [selection])
+    try {
+      if (!selection.featureId) {
+        cgv.reset()
+        return
+      }
+      const midBp = Math.round((selection.start + selection.end) / 2) + 1  // CGView is 1-indexed
+      const featLen = Math.max(selection.end - selection.start, 1)
+      const contextWindow = Math.max(featLen * 20, 10_000)
+      const zoom = Math.max(5, Math.min(doc.length / contextWindow, 500))
+      cgv.zoomTo(midBp, zoom, { duration: 600 })
+    } catch (_) { /* silent */ }
+  }, [selection, doc.length])
 
   // ---- Resize via ResizeObserver -------------------------------------------
   useEffect(() => {
