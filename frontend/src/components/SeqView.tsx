@@ -342,15 +342,13 @@ function gcPercent(seq: string): string {
 function tmCelsius(seq: string): string {
   const len = seq.length
   if (len < 6) return '—'
-  let gc = 0, at = 0
+  let gc = 0
   for (const b of seq) {
     const u = b.toUpperCase()
     if (u === 'G' || u === 'C') gc++
-    else if (u === 'A' || u === 'T') at++
   }
-  const tm = len <= 13
-    ? 2 * at + 4 * gc
-    : 64.9 + 41 * (gc - 16.4) / len
+  // Marmur-Schildkraut-Doty, 50 mM NaCl — matches BioPython Tm_GC / R TmCalculator
+  const tm = 81.5 + 16.6 * Math.log10(0.05) + 0.41 * (gc / len * 100) - 675 / len
   return tm.toFixed(1) + '°C'
 }
 

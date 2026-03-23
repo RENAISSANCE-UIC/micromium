@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useSelection } from '../hooks/useSelection'
+import { genomeFeatureLightColor } from '../lib/cgviewJson'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
 type SortKey = 'label' | 'type' | 'start' | 'end' | 'length' | 'direction'
@@ -119,7 +120,9 @@ export function FeatureTable({ doc }: FeatureTableProps) {
         <tbody>
           {filtered.map(feat => {
             const isSelected = selection?.featureId === feat.id
-            const fwdColor = feat.direction === 'reverse' ? feat.revColor : feat.fwdColor
+            const fwdColor = doc.mode === 'genome'
+              ? genomeFeatureLightColor(feat.type)
+              : feat.direction === 'reverse' ? feat.revColor : feat.fwdColor
             return (
               <tr
                 key={feat.id}

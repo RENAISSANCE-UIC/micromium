@@ -119,7 +119,7 @@ export default function App() {
             <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
               <div style={{ flex: '1 1 auto', display: 'flex', minHeight: 0, overflow: 'hidden' }}>
                 <div style={{ width: seqPanelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: '1px solid #d0d0d0' }}>
-                  <GenomeSeqPanel doc={doc} alwaysShow />
+                  <GenomeSeqPanel doc={doc} alwaysShow genomeMode />
                 </div>
                 <div onMouseDown={startSeqPanelDrag} style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: '#d0d0d0' }} />
                 <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}>

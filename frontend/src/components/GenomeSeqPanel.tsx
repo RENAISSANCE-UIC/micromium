@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { fetchSequence } from '../api'
+import { genomeFeatureLightColor } from '../lib/cgviewJson'
 import { useSelection } from '../hooks/useSelection'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
@@ -45,15 +46,13 @@ function gcPercent(seq: string): string {
 function tmCelsius(seq: string): string {
   const len = seq.length
   if (len < 6) return '—'
-  let gc = 0, at = 0
+  let gc = 0
   for (const b of seq) {
     const u = b.toUpperCase()
     if (u === 'G' || u === 'C') gc++
-    else if (u === 'A' || u === 'T') at++
   }
-  const tm = len <= 13
-    ? 2 * at + 4 * gc
-    : 64.9 + 41 * (gc - 16.4) / len
+  // Marmur-Schildkraut-Doty, 50 mM NaCl — matches BioPython Tm_GC / R TmCalculator
+  const tm = 81.5 + 16.6 * Math.log10(0.05) + 0.41 * (gc / len * 100) - 675 / len
   return tm.toFixed(1) + '°C'
 }
 
@@ -174,11 +173,12 @@ function Tick({ col, label }: { col: number; label: string }) {
   )
 }
 
-function ArrowTrack({ tracks, isFwd, selId, onFeatClick }: {
+function ArrowTrack({ tracks, isFwd, selId, onFeatClick, genomeMode }: {
   tracks:       TrackItem[]
   isFwd:        boolean
   selId:        string
   onFeatClick:  (f: FeatureDTO) => void
+  genomeMode:   boolean
 }) {
   if (!tracks.length) return null
   const layerCount = Math.max(...tracks.map(t => t.layer)) + 1
@@ -187,7 +187,9 @@ function ArrowTrack({ tracks, isFwd, selId, onFeatClick }: {
   return (
     <div style={{ position: 'relative', height }}>
       {tracks.map((item, ti) => {
-        const color    = isFwd ? item.feat.fwdColor : item.feat.revColor
+        const color = genomeMode
+          ? genomeFeatureLightColor(item.feat.type)
+          : isFwd ? item.feat.fwdColor : item.feat.revColor
         const top      = TRACK_GAP + item.layer * (TRACK_HEIGHT + TRACK_GAP)
         const widthCh  = item.colEnd - item.colStart
         const selected = item.feat.id === selId
@@ -236,9 +238,9 @@ function ArrowTrack({ tracks, isFwd, selId, onFeatClick }: {
 
 // ---- Main component ------------------------------------------------------
 
-interface Props { doc: DocumentDTO; alwaysShow?: boolean }
+interface Props { doc: DocumentDTO; alwaysShow?: boolean; genomeMode?: boolean }
 
-export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
+export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
   const { selection, publish } = useSelection('seqpanel')
 
   const [state, setState] = useState<{
@@ -446,7 +448,7 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
                 <div style={{ marginLeft: `calc(${GUTTER_W} + ${GUTTER_MX}px)` }}>
                   <ArrowTrack
                     tracks={layout.fwdTracks} isFwd={true}
-                    selId={selId} onFeatClick={onFeatClick}
+                    selId={selId} onFeatClick={onFeatClick} genomeMode={!!genomeMode}
                   />
                 </div>
               )}
@@ -459,7 +461,7 @@ export function GenomeSeqPanel({ doc, alwaysShow }: Props) {
                 }}>
                   <ArrowTrack
                     tracks={layout.revTracks} isFwd={false}
-                    selId={selId} onFeatClick={onFeatClick}
+                    selId={selId} onFeatClick={onFeatClick} genomeMode={!!genomeMode}
                   />
                 </div>
               )}

@@ -83,6 +83,24 @@ export function GenomeMap({ doc }: GenomeMapProps) {
 
     viewer.draw()
 
+    // 5. Legend position + font + lock interactivity — must be set after draw()
+    try {
+      viewer.legend.position    = 'bottom-right'
+      viewer.legend.font        = 'sans-serif, plain, 10'
+      viewer.legend.interactive = false
+      viewer.draw()
+    } catch (_) { /* silent */ }
+
+    // 6. Block legend recolor clicks — CGView ignores interactive:false on its own.
+    //    A transparent overlay in the bottom-right corner absorbs pointer events
+    //    before they reach the canvas, without obscuring any genome features.
+    const legendBlocker = document.createElement('div')
+    legendBlocker.style.cssText = [
+      'position:absolute', 'bottom:0', 'right:0',
+      'width:250px', 'height:190px', 'z-index:50',
+    ].join(';')
+    el.appendChild(legendBlocker)
+
     // ---- id → FeatureDTO (used by selection receive effect) ----------------
     const idMap = new Map<string, FeatureDTO>(doc.features.map(f => [f.id, f]))
 
@@ -190,6 +208,7 @@ export function GenomeMap({ doc }: GenomeMapProps) {
       try { cgv.canvas.resize(width, height) } catch (_) {
         try { cgv.draw() } catch (_2) { /* silent */ }
       }
+      try { cgv.legend.position = 'bottom-right' } catch (_) { /* silent */ }
     })
     ro.observe(el)
     return () => ro.disconnect()

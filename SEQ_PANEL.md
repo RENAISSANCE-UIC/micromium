@@ -35,13 +35,12 @@ Compute GC% for `doc.bases.slice(selection.start, selection.end)`.
 **Acceptance:** select the full `pSB1C3.gb` sequence (2070 bp). GC% should match
 the value reported by ApE or a known-good reference tool.
 
-### S1c — Tm calculation ✅ DONE
-Basic Wallace rule for short sequences (< 14 bp); salt-adjusted nearest-neighbour
-approximation for longer ones is Phase S2. For now:
+### S1c — Tm calculation ✅ DONE (Marmur-Schildkraut-Doty, 50 mM NaCl — matches BioPython Tm_GC / R TmCalculator; spot-checked against CmR and fruB)
+Single formula for all lengths ≥ 6 bp:
 
-- `Tm = 2(A+T) + 4(G+C)` for sequences ≤ 13 bp
-- `Tm = 64.9 + 41 * (G+C - 16.4) / length` for sequences > 13 bp (Bolton–McCarthy)
-- Display `—` if selection length < 6 bp (Tm undefined at very short lengths)
+- `Tm = 81.5 + 16.6·log₁₀(0.05) + 0.41·(%GC) − 675/N` (Marmur-Schildkraut-Doty, 50 mM NaCl)
+- Display `—` if length < 6 bp
+- Nearest-neighbour thermodynamics (primer-grade) deferred to Phase S2 primer sketchpad
 
 **Acceptance:** select a known primer from `pSB1C3.gb` features, compare Tm to
 a reference calculator (e.g., Thermo or NEB Tm tool).

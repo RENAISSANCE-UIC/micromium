@@ -14,6 +14,9 @@ declare namespace CGView {
   }
 
   interface Legend {
+    position:    string
+    font:        string
+    interactive: boolean
     items(): LegendItem[]
   }
 

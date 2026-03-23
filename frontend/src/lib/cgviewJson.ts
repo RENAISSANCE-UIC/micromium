@@ -18,6 +18,21 @@ const PALETTE: Record<string, string> = {
   other:         '#7f8c8d',
 }
 
+/** Returns the genome-mode display colour for a feature type. */
+export function genomeFeatureColor(type: string): string {
+  return PALETTE[type] ?? PALETTE.other
+}
+
+/** Returns a pastel (55% white-blended) version for use in text-heavy panes. */
+export function genomeFeatureLightColor(type: string): string {
+  const hex = genomeFeatureColor(type)
+  const n = parseInt(hex.slice(1), 16)
+  const r = Math.round(((n >> 16) & 0xff) * 0.45 + 255 * 0.55)
+  const g = Math.round(((n >>  8) & 0xff) * 0.45 + 255 * 0.55)
+  const b = Math.round(( n        & 0xff) * 0.45 + 255 * 0.55)
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`
+}
+
 // Feature types routed to the ncRNA track
 const NCRNA_TYPES = new Set(['tRNA', 'rRNA', 'tmRNA', 'repeat_region'])
 
@@ -150,8 +165,9 @@ export function buildCGViewJSON(doc: DocumentDTO): object {
       },
       features: featureObjects,
       legend: {
-        position: 'top-right',
-        items:    legendItems,
+        position:    'top-right',
+        interactive: false,
+        items:       legendItems,
       },
       tracks,
     },
