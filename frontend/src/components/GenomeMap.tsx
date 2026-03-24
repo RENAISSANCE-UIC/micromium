@@ -91,15 +91,16 @@ export function GenomeMap({ doc }: GenomeMapProps) {
       viewer.draw()
     } catch (_) { /* silent */ }
 
-    // 6. Block legend recolor clicks — CGView ignores interactive:false on its own.
-    //    A transparent overlay in the bottom-right corner absorbs pointer events
-    //    before they reach the canvas, without obscuring any genome features.
-    const legendBlocker = document.createElement('div')
-    legendBlocker.style.cssText = [
-      'position:absolute', 'bottom:0', 'right:0',
-      'width:250px', 'height:190px', 'z-index:50',
-    ].join(';')
-    el.appendChild(legendBlocker)
+    // 6. Disable the CGView built-in color picker.
+    //    viewer.colorPicker is a lazy getter — accessing it forces instantiation.
+    //    Replacing open() with a no-op prevents the picker from ever appearing,
+    //    regardless of where the swatch click lands.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cp = (viewer as any).colorPicker
+      if (cp && typeof cp.open === 'function') cp.open = () => {}
+      if (cp && typeof cp.close === 'function') cp.close = () => {}
+    } catch (_) { /* silent */ }
 
     // ---- id → FeatureDTO (used by selection receive effect) ----------------
     const idMap = new Map<string, FeatureDTO>(doc.features.map(f => [f.id, f]))
