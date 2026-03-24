@@ -84,7 +84,7 @@ Independent of S1/S2. Can be built in parallel once S1a lands, but should be
 tested after — the chips affect what annotation arrows are rendered, which must
 not break selection or HUD state.
 
-### S3a — Filter state ✅ TODO
+### S3a — Filter state ✅ DONE
 Add `hiddenTypes: Set<string>` state to `SeqView`. Derive `visibleFeatures` from
 `doc.features` by filtering out hidden types before passing to `buildLineLayouts`.
 
@@ -94,7 +94,7 @@ Add `hiddenTypes: Set<string>` state to `SeqView`. Derive `visibleFeatures` from
 **Acceptance:** toggling a type clears its arrows from the sequence view without
 affecting other views (CircMap, FeatureTable, GenomeMap unaffected).
 
-### S3b — Chip bar UI ✅ TODO
+### S3b — Chip bar UI ✅ DONE
 A compact row of toggleable chips above the sequence panel, below the search bar
 in the layout hierarchy.
 
@@ -112,7 +112,7 @@ Pre-seeded chip set (in order):
 **Acceptance:** open `Ecoli_NIST0056.gbk`. Toggle CDS off → all CDS arrows
 disappear from SeqView. Toggle back on → arrows return. Other panels unchanged.
 
-### S3c — Auto-populate chip set from document ✅ TODO
+### S3c — Auto-populate chip set from document ✅ DONE
 Rather than a hardcoded list, derive the chip set from the types actually present
 in `doc.features`, with the pre-seeded types (S3b) appearing first if present.
 
@@ -131,7 +131,7 @@ Improves the existing scroll-to behavior. SeqView already scrolls to a feature
 when selected via the table or map — these steps make that behavior more precise
 and add manual navigation.
 
-### S4a — Center-on-feature scroll ✅ TODO
+### S4a — Center-on-feature scroll ✅ DONE
 Currently `scrollToItem(lineNum, 'center')` scrolls to the first line of a feature.
 For multi-line features, the feature start is correct but the context is poor.
 
@@ -143,7 +143,7 @@ For multi-line features, the feature start is correct but the context is poor.
 → SeqView scrolls so the feature start is near the top of the visible area, not
 off-screen or clipped at the bottom.
 
-### S4b — Jump to coordinate input ✅ TODO
+### S4b — Jump to coordinate input ✅ DONE
 A small input in the chip bar row (right-aligned): `Go to bp:` with a number field.
 On Enter, scrolls SeqView to that 1-based coordinate.
 
