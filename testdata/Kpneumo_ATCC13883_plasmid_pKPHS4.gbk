@@ -1,0 +1,250 @@
+LOCUS       NC_016840               3751 bp    DNA     circular CON 03-AUG-2016
+DEFINITION  Klebsiella pneumoniae subsp. pneumoniae HS11286 plasmid pKPHS4,
+            complete sequence.
+ACCESSION   NC_016840
+VERSION     NC_016840.1
+DBLINK      BioProject: PRJNA84387
+            Assembly: GCF_000240185.1
+KEYWORDS    RefSeq.
+SOURCE      Klebsiella pneumoniae subsp. pneumoniae HS11286
+  ORGANISM  Klebsiella pneumoniae subsp. pneumoniae HS11286
+            Bacteria; Pseudomonadati; Pseudomonadota; Gammaproteobacteria;
+            Enterobacterales; Enterobacteriaceae; Klebsiella/Raoultella group;
+            Klebsiella; Klebsiella pneumoniae complex.
+REFERENCE   1  (bases 1 to 3751)
+  CONSRTM   NCBI Genome Project
+  TITLE     Direct Submission
+  JOURNAL   Submitted (06-FEB-2012) National Center for Biotechnology
+            Information, NIH, Bethesda, MD 20894, USA
+REFERENCE   2  (bases 1 to 3751)
+  AUTHORS   Ou,H.-Y., Jiang,X., Liu,P. and Li,P.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (22-DEC-2011) State Key Laboratory of Microbial
+            Metabolism, Shanghai Jiaotong University, 1954 Huashan Road,
+            Shanghai 200030, China
+COMMENT     REVIEWED REFSEQ: This record has been curated by NCBI staff. The
+            reference sequence is identical to CP003226.
+            RefSeq Category: Reference Genome
+                        CLI: Clinical Isolate
+            Source DNA is available from Hong-Yu Ou at hyou@sjtu.edu.cn.
+            COMPLETENESS: full length.
+FEATURES             Location/Qualifiers
+     source          1..3751
+                     /organism="Klebsiella pneumoniae subsp. pneumoniae
+                     HS11286"
+                     /mol_type="genomic DNA"
+                     /strain="HS11286"
+                     /sub_species="pneumoniae"
+                     /db_xref="taxon:1125630"
+                     /plasmid="pKPHS4"
+     gene            complement(162..680)
+                     /locus_tag="KPHS_p400010"
+                     /db_xref="GeneID:11743756"
+     CDS             complement(162..680)
+                     /locus_tag="KPHS_p400010"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="YP_005221101.1"
+                     /db_xref="GeneID:11743756"
+                     /translation="MRFLLILRISTEDTPCTRRPQAIYCTTTTHRKKTPGSTTNMRIS
+                     NIEWLKKRIGFIRKLGEQTARQRQIIDLLDNEAGLTEQERKLLHVLATAEKNDLQAQE
+                     SERKQAVQKRIEGKKQRRERNHRLFLAAGLLIEAGLVDTKTGELCYKKDRILQALKEI
+                     KYDLETSPNPDA"
+     gene            737..1663
+                     /locus_tag="KPHS_p400020"
+                     /db_xref="GeneID:11743757"
+     CDS             737..1663
+                     /locus_tag="KPHS_p400020"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="mobilization protein"
+                     /protein_id="YP_005221102.1"
+                     /db_xref="GeneID:11743757"
+                     /translation="MATYHLSVKFGGKGQAANHADYIERKEKYRDRQDLEYSAHGNMP
+                     EWARDNPSHFWQAADQFERANGSTYRELEIALPRELTAEQRLELVQDFVRQEAGERHA
+                     WSFAIHNPKASIDGGEQPHAHIMMSQRVNDGIERTPEQYFRRYNARYPERGGAKKDSG
+                     SLTLTQQKEQLRELRKRWEVKHNEHMRKHGFERGFIDCRTLKEQGIERRPEVHLGFEA
+                     AGRLDDAQRHDIMQKRSEPDYSRHLEQARTVGYDIREWLDTPVKQHELVRRLQHDVAR
+                     EHGFDMRDRVSRQNRTEPERVKSPSRGFSMGF"
+     gene            1666..2199
+                     /locus_tag="KPHS_p400030"
+                     /db_xref="GeneID:11743758"
+     CDS             1666..2199
+                     /locus_tag="KPHS_p400030"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="YP_005221103.1"
+                     /db_xref="GeneID:11743758"
+                     /translation="MASTEEKLLTLLLSVEHLQHTAMEQQKAVADSLAVARETLRGYR
+                     DISDGVAKQVRDEVRNEVQKLDVAGLIGERISQDFQRLEESVANMKANADALNRDIAT
+                     IHSNIVQEYNTLKGYSWKWLGGVSVAFLVMFCVLGWGMKTMLDRNYNATAAVYQKVVT
+                     LEDKLAEKPVTGKSRKN"
+     gene            2633..3652
+                     /locus_tag="KPHS_p400040"
+                     /db_xref="GeneID:11743759"
+     CDS             2633..3652
+                     /locus_tag="KPHS_p400040"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="plasmid replication protein"
+                     /protein_id="YP_005221104.1"
+                     /db_xref="GeneID:11743759"
+                     /translation="MSAALQYFEENLPHRPYHTDDLAFGLRISGKGRALLARYIQQNQ
+                     PHAQFWLVFDVDREGAAIDWSDRNAPAPNITVKNPVNGHAHLLYALNIAVRTAPDASV
+                     KALKYAAAVERSLCEKLCADVNYSGLICKNPFHLEWQVMEWREDAYTLDELADYLDLS
+                     ASERRSIDKHYGMGRNCHLFEMTRKWAYRAIRQGWPAFSQWLEAVIQRVEMYNASLPV
+                     PLSLAECRAIGKSIAKYTHRNFTPETFAQYVADTHTPEIQAARGRKGGKANSSENQSD
+                     KGKKSAAVRWTANDDKRRRALDMYILGASTEDIAVAVGVSSRTIRRWMDNSGEWLTKK
+                     QIIKC"
+CONTIG      join(CP003226.1:1..3751)
+//
+
+LOCUS       CP003226                3751 bp    DNA     circular BCT 25-JUL-2016
+DEFINITION  Klebsiella pneumoniae subsp. pneumoniae HS11286 plasmid pKPHS4,
+            complete sequence.
+ACCESSION   CP003226
+VERSION     CP003226.1
+DBLINK      BioProject: PRJNA78789
+            BioSample: SAMN02602959
+KEYWORDS    .
+SOURCE      Klebsiella pneumoniae subsp. pneumoniae HS11286
+  ORGANISM  Klebsiella pneumoniae subsp. pneumoniae HS11286
+            Bacteria; Pseudomonadati; Pseudomonadota; Gammaproteobacteria;
+            Enterobacterales; Enterobacteriaceae; Klebsiella/Raoultella group;
+            Klebsiella; Klebsiella pneumoniae complex.
+REFERENCE   1  (bases 1 to 3751)
+  AUTHORS   Ou,H.-Y., Jiang,X., Liu,P. and Li,P.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (22-DEC-2011) State Key Laboratory of Microbial
+            Metabolism, Shanghai Jiaotong University, 1954 Huashan Road,
+            Shanghai 200030, China
+COMMENT     Source DNA is available from Hong-Yu Ou at hyou@sjtu.edu.cn.
+FEATURES             Location/Qualifiers
+     source          1..3751
+                     /organism="Klebsiella pneumoniae subsp. pneumoniae
+                     HS11286"
+                     /mol_type="genomic DNA"
+                     /strain="HS11286"
+                     /sub_species="pneumoniae"
+                     /db_xref="taxon:1125630"
+                     /plasmid="pKPHS4"
+     gene            complement(162..680)
+                     /locus_tag="KPHS_p400010"
+     CDS             complement(162..680)
+                     /locus_tag="KPHS_p400010"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="AEW92362.1"
+                     /translation="MRFLLILRISTEDTPCTRRPQAIYCTTTTHRKKTPGSTTNMRIS
+                     NIEWLKKRIGFIRKLGEQTARQRQIIDLLDNEAGLTEQERKLLHVLATAEKNDLQAQE
+                     SERKQAVQKRIEGKKQRRERNHRLFLAAGLLIEAGLVDTKTGELCYKKDRILQALKEI
+                     KYDLETSPNPDA"
+     gene            737..1663
+                     /locus_tag="KPHS_p400020"
+     CDS             737..1663
+                     /locus_tag="KPHS_p400020"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="mobilization protein"
+                     /protein_id="AEW92363.1"
+                     /translation="MATYHLSVKFGGKGQAANHADYIERKEKYRDRQDLEYSAHGNMP
+                     EWARDNPSHFWQAADQFERANGSTYRELEIALPRELTAEQRLELVQDFVRQEAGERHA
+                     WSFAIHNPKASIDGGEQPHAHIMMSQRVNDGIERTPEQYFRRYNARYPERGGAKKDSG
+                     SLTLTQQKEQLRELRKRWEVKHNEHMRKHGFERGFIDCRTLKEQGIERRPEVHLGFEA
+                     AGRLDDAQRHDIMQKRSEPDYSRHLEQARTVGYDIREWLDTPVKQHELVRRLQHDVAR
+                     EHGFDMRDRVSRQNRTEPERVKSPSRGFSMGF"
+     gene            1666..2199
+                     /locus_tag="KPHS_p400030"
+     CDS             1666..2199
+                     /locus_tag="KPHS_p400030"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="AEW92364.1"
+                     /translation="MASTEEKLLTLLLSVEHLQHTAMEQQKAVADSLAVARETLRGYR
+                     DISDGVAKQVRDEVRNEVQKLDVAGLIGERISQDFQRLEESVANMKANADALNRDIAT
+                     IHSNIVQEYNTLKGYSWKWLGGVSVAFLVMFCVLGWGMKTMLDRNYNATAAVYQKVVT
+                     LEDKLAEKPVTGKSRKN"
+     gene            2633..3652
+                     /locus_tag="KPHS_p400040"
+     CDS             2633..3652
+                     /locus_tag="KPHS_p400040"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="plasmid replication protein"
+                     /protein_id="AEW92365.1"
+                     /translation="MSAALQYFEENLPHRPYHTDDLAFGLRISGKGRALLARYIQQNQ
+                     PHAQFWLVFDVDREGAAIDWSDRNAPAPNITVKNPVNGHAHLLYALNIAVRTAPDASV
+                     KALKYAAAVERSLCEKLCADVNYSGLICKNPFHLEWQVMEWREDAYTLDELADYLDLS
+                     ASERRSIDKHYGMGRNCHLFEMTRKWAYRAIRQGWPAFSQWLEAVIQRVEMYNASLPV
+                     PLSLAECRAIGKSIAKYTHRNFTPETFAQYVADTHTPEIQAARGRKGGKANSSENQSD
+                     KGKKSAAVRWTANDDKRRRALDMYILGASTEDIAVAVGVSSRTIRRWMDNSGEWLTKK
+                     QIIKC"
+ORIGIN      
+        1 tttttgagca gcgggctttc cggcggtttt ctcctctcag cccagcaatg gtgcggccta
+       61 ccgcatgatt gaggtggtcg tgctcgccgc agtctcatga ccgagcgtag cgagcgaatg
+      121 agcgaggaag caccagggaa ccggaacacg gatggaggca cttacgcgtc tgggtttggg
+      181 gatgtctcca gatcgtactt aatttcctta agtgcctgta atatcctgtc ttttttatag
+      241 catagctcgc ctgtttttgt gtctaccagt cctgcttcga tcagtagccc agccgcgaga
+      301 aagagtcggt gattgcgttc tcgtcgttgt ttttttccct cgattcgttt ttggaccgcc
+      361 tgttttcgtt cgctctcctg tgcctgtaag tcgttttttt ccgctgttgc cagtacgtgg
+      421 aggagtttgc gttcctgttc tgtgagtcct gcttcgttgt cgagcaggtc aataatctgt
+      481 ctctgtcgtg cggtctgttc tccgagcttc ctgatgaatc cgatccgttt cttcagccat
+      541 tcgatgttgc tgatgcgcat gttcgtggtg ctccctggtg tttttttgcg gtgtgttgtg
+      601 gtcgtgcagt atatcgcttg cggtcggcgg gtgcaggggg tatcttccgt gctaattcgt
+      661 aaaattagaa ggaagcgcac ttatatgttt ctctccttcg tcgagaaaca gtgcgctcct
+      721 gcggagggct gaaaccgtgg caacctatca cctcagcgtt aaatttggtg gcaaggggca
+      781 ggctgcaaac cacgccgatt acatcgagcg caaagagaaa taccgcgacc gtcaggattt
+      841 ggaatattcc gcacacggaa acatgccgga atgggcgcga gataatccct cacatttctg
+      901 gcaggctgct gaccagtttg aacgtgcgaa cggttcgacc tatcgggaac ttgaaattgc
+      961 attaccccgt gaactgacag cggaacagcg ccttgaactg gtgcaggatt ttgtacgtca
+     1021 ggaagctggc gaacggcacg cctggagttt tgccattcac aatccgaaag cgagcattga
+     1081 cggcggcgaa cagcctcatg cgcatatcat gatgagccag cgtgtgaatg atggcattga
+     1141 acgtacaccg gaacagtatt tccggcgcta taacgccagg tatcccgagc ggggaggtgc
+     1201 gaaaaaggat tccggaagcc tgactctcac tcagcaaaaa gagcagttgc gggaattgcg
+     1261 aaaacgctgg gaggtgaagc acaacgaaca tatgagaaag catggctttg aaaggggctt
+     1321 cattgactgc cggacgctga aagaacaggg cattgaacga cgtcccgaag tgcatctggg
+     1381 ttttgaagct gccggacggc ttgatgatgc ccagcgtcat gacatcatgc aaaaacggtc
+     1441 tgaaccggac tattcccgcc atcttgaaca ggcgcgaacg gtcgggtatg acatcaggga
+     1501 atggctggac actccggtta agcaacatga actggtcaga aggctgcaac atgatgttgc
+     1561 gcgggagcat ggctttgaca tgagagacag agtgagcaga cagaaccgaa ctgaacctga
+     1621 acgggttaaa tcaccgtcac gtggattttc tatgggattc tgaacatggc cagcacagaa
+     1681 gaaaaattac tcacgctcct gttatcggtg gagcatctgc aacataccgc aatggagcaa
+     1741 cagaaagctg ttgctgattc tctggctgtg gcaagggaaa cacttcgcgg atatcgggat
+     1801 atttctgacg gtgtggcaaa acaggtcagg gatgaagtca gaaacgaggt gcagaagctg
+     1861 gatgttgcag ggctgatagg tgagcgcatc agccaggatt ttcagcggct ggaagagtca
+     1921 gtcgcaaaca tgaaggcaaa cgcggatgcc ctgaacaggg atattgcgac aattcacagc
+     1981 aatatcgtgc aggaatacaa cacccttaaa gggtatagct ggaaatggct gggtggggtg
+     2041 tcagtggctt ttctggttat gttctgtgtg cttggatggg gaatgaaaac aatgctcgac
+     2101 aggaactaca acgccacagc ggcggtgtat cagaaagttg tgacactgga agataaactg
+     2161 gcggagaaac ctgtcacggg caagagccgg aaaaactgac gcgcttcgct tgtccaacgc
+     2221 ctcacgaccc gcgaaaaaat tccgcgtccc gttcaccgtt ttctgatgag aaagtttgct
+     2281 gttttgaccc gttcgccctt ctgaacgctc gaaacagatc gcgcatcgct ttcgtgcata
+     2341 gttatgcaac gcgctaaaaa cgattctgac gcatttttct ggtttagcct ggtgtttcct
+     2401 tgtctttttg cgttttttgc gccagagagc gactgagggc gttttaaggg gggcgtacaa
+     2461 cgggagttat ggtaaatgga tcggttttgc gggaaggctc gacaggtttt gttgttgggg
+     2521 gtagtgtaag cgactgaaaa acaaacgccc ctgaaattcg tgtctctccg ccaagattgt
+     2581 cacgagaata caggggcgag gtcggtcgat aacctggaag gaatcgtaac acatgagcgc
+     2641 cgcgcttcaa tacttcgaag aaaatttacc ccaccgcccc tatcacacgg atgatctcgc
+     2701 tttcggcctt cgcatctccg gcaaagggcg tgcgcttctt gcgcggtaca tccagcagaa
+     2761 ccagcctcat gcgcagttct ggctggtttt tgacgttgac cgcgaggggg ctgcgattga
+     2821 ctggagcgac cggaacgccc ccgcgccgaa catcaccgtt aaaaatcctg tgaacggaca
+     2881 cgctcacctg ctctacgcac tcaacatcgc cgtgagaacc gcgcctgatg cctcggttaa
+     2941 ggcgctgaaa tatgccgcag cggttgaacg ttcgctgtgt gagaaacttt gtgctgatgt
+     3001 gaactacagc ggcctgattt gcaaaaatcc gttccacctg gaatggcagg tgatggagtg
+     3061 gcgcgaggac gcctataccc tcgatgaact ggcagattat ctcgatttga gcgcctcaga
+     3121 gcgtcgtagc atcgataaac attacgggat ggggcgaaac tgccacctgt tcgaaatgac
+     3181 gcgcaaatgg gcttacaggg cgattcgtca gggctggcca gcgttctcac agtggcttga
+     3241 agcggtgatc cagcgtgtcg aaatgtacaa tgcatcgctt cccgttccgc tttcactggc
+     3301 tgaatgtcgg gctattggca agagcattgc gaaatacacg cacaggaact tcacgccgga
+     3361 aactttcgca cagtatgtgg ctgatacgca cacgccagaa attcaggcag cacgcggtcg
+     3421 caagggcggg aaggccaatt cgtcagaaaa tcagtcggac aaagggaaaa aaagcgccgc
+     3481 tgttcggtgg actgctaacg acgacaaacg tcgtagggcg cttgatatgt atatcttggg
+     3541 agcgtcaacg gaagatattg cagtggcggt tggtgttagc agccggacta ttcgacgctg
+     3601 gatggataat tctggagaat ggctaaccaa gaaacaaata attaaatgtt agttaacaaa
+     3661 gaagtaacac taccccccgt tttttgttaa tgggtggtta aattcgcgga catgaacaag
+     3721 cctatatcag ataacagcgc ctttcggcgt c
+//

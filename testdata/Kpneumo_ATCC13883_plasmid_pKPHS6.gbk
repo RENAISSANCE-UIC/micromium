@@ -1,0 +1,121 @@
+LOCUS       NC_016841               1308 bp    DNA     circular CON 03-AUG-2016
+DEFINITION  Klebsiella pneumoniae subsp. pneumoniae HS11286 plasmid pKPHS6,
+            complete sequence.
+ACCESSION   NC_016841
+VERSION     NC_016841.1
+DBLINK      BioProject: PRJNA84387
+            Assembly: GCF_000240185.1
+KEYWORDS    RefSeq.
+SOURCE      Klebsiella pneumoniae subsp. pneumoniae HS11286
+  ORGANISM  Klebsiella pneumoniae subsp. pneumoniae HS11286
+            Bacteria; Pseudomonadati; Pseudomonadota; Gammaproteobacteria;
+            Enterobacterales; Enterobacteriaceae; Klebsiella/Raoultella group;
+            Klebsiella; Klebsiella pneumoniae complex.
+REFERENCE   1  (bases 1 to 1308)
+  CONSRTM   NCBI Genome Project
+  TITLE     Direct Submission
+  JOURNAL   Submitted (06-FEB-2012) National Center for Biotechnology
+            Information, NIH, Bethesda, MD 20894, USA
+REFERENCE   2  (bases 1 to 1308)
+  AUTHORS   Ou,H.-Y., Jiang,X., Liu,P. and Li,P.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (22-DEC-2011) State Key Laboratory of Microbial
+            Metabolism, Shanghai Jiaotong University, 1954 Huashan Road,
+            Shanghai 200030, China
+COMMENT     REVIEWED REFSEQ: This record has been curated by NCBI staff. The
+            reference sequence is identical to CP003228.
+            RefSeq Category: Reference Genome
+                        CLI: Clinical Isolate
+            Source DNA is available from Hong-Yu Ou at hyou@sjtu.edu.cn.
+            COMPLETENESS: full length.
+FEATURES             Location/Qualifiers
+     source          1..1308
+                     /organism="Klebsiella pneumoniae subsp. pneumoniae
+                     HS11286"
+                     /mol_type="genomic DNA"
+                     /strain="HS11286"
+                     /sub_species="pneumoniae"
+                     /db_xref="taxon:1125630"
+                     /plasmid="pKPHS6"
+     gene            326..862
+                     /locus_tag="KPHS_p600010"
+                     /db_xref="GeneID:11743761"
+     CDS             326..862
+                     /locus_tag="KPHS_p600010"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="RepA plasmid replication protein"
+                     /protein_id="YP_005221105.1"
+                     /db_xref="GeneID:11743761"
+                     /translation="MQTQNVVTDKEREIRKRDLEDKDRKNASERRQEQKNQNFTQVYP
+                     LGWKRLRELFRKNPGAAELYSMLAENIDGSCGAVVADQTHLASLLGVGRQTISRYVKW
+                     LEEQGVLVKIPVAGKVCAYALNPHEVWKGYDNAKPYAAFLTKTLVNKDGDIQRRIMAM
+                     FHGNDARQGMEGDTPEAE"
+CONTIG      join(CP003228.1:1..1308)
+//
+
+LOCUS       CP003228                1308 bp    DNA     circular BCT 25-JUL-2016
+DEFINITION  Klebsiella pneumoniae subsp. pneumoniae HS11286 plasmid pKPHS6,
+            complete sequence.
+ACCESSION   CP003228
+VERSION     CP003228.1
+DBLINK      BioProject: PRJNA78789
+            BioSample: SAMN02602959
+KEYWORDS    .
+SOURCE      Klebsiella pneumoniae subsp. pneumoniae HS11286
+  ORGANISM  Klebsiella pneumoniae subsp. pneumoniae HS11286
+            Bacteria; Pseudomonadati; Pseudomonadota; Gammaproteobacteria;
+            Enterobacterales; Enterobacteriaceae; Klebsiella/Raoultella group;
+            Klebsiella; Klebsiella pneumoniae complex.
+REFERENCE   1  (bases 1 to 1308)
+  AUTHORS   Ou,H.-Y., Jiang,X., Liu,P. and Li,P.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (22-DEC-2011) State Key Laboratory of Microbial
+            Metabolism, Shanghai Jiaotong University, 1954 Huashan Road,
+            Shanghai 200030, China
+COMMENT     Source DNA is available from Hong-Yu Ou at hyou@sjtu.edu.cn.
+FEATURES             Location/Qualifiers
+     source          1..1308
+                     /organism="Klebsiella pneumoniae subsp. pneumoniae
+                     HS11286"
+                     /mol_type="genomic DNA"
+                     /strain="HS11286"
+                     /sub_species="pneumoniae"
+                     /db_xref="taxon:1125630"
+                     /plasmid="pKPHS6"
+     gene            326..862
+                     /locus_tag="KPHS_p600010"
+     CDS             326..862
+                     /locus_tag="KPHS_p600010"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="RepA plasmid replication protein"
+                     /protein_id="AEW92371.1"
+                     /translation="MQTQNVVTDKEREIRKRDLEDKDRKNASERRQEQKNQNFTQVYP
+                     LGWKRLRELFRKNPGAAELYSMLAENIDGSCGAVVADQTHLASLLGVGRQTISRYVKW
+                     LEEQGVLVKIPVAGKVCAYALNPHEVWKGYDNAKPYAAFLTKTLVNKDGDIQRRIMAM
+                     FHGNDARQGMEGDTPEAE"
+ORIGIN      
+        1 cggaacccct gaaggggccc ccacgatttt tcggttgcca atggttaaat tttcaccgtt
+       61 ttttgcccga ctgaaaggag ggtgctacct ggagatctcg cagctcgctg tgagatcttt
+      121 ttagataaga aggaaaaaat tgtatgttgt tgtttttatt atgggtttat aaatgtgttg
+      181 tcgcatccta ggggcgacaa cgttgtcgca tctataggat gcgacagata tacccaacat
+      241 gtcgtgcaaa tgcgacatgt tgacacaaaa aaatgacaac tgtatgttac tttcaaacga
+      301 catggtgtcg caggagagat agtctatgca aactcaaaat gttgtgacgg acaaagaacg
+      361 ggaaatcaga aaaagagatc ttgaagataa agaccgtaaa aacgcctcag agcgtcgaca
+      421 ggagcaaaaa aaccaaaact tcacccaagt atacccttta ggctggaagc gtctcagaga
+      481 gcttttcagg aagaatccgg gggcagcaga gctttattca atgcttgcag aaaacattga
+      541 tggctcttgt ggtgcggttg ttgccgatca aacccattta gcatcgttgc ttggtgttgg
+      601 tagacaaaca atatctaggt acgttaagtg gctagaagag caaggtgttt tagtaaaaat
+      661 cccagtagct ggaaaggtat gcgcttatgc tctcaacccg catgaagtct ggaaaggcta
+      721 cgataatgcc aaaccgtatg ccgcattttt gacgaaaacc ctagtcaaca aagacggcga
+      781 tattcagcgc cgaatcatgg ccatgttcca cggaaacgat gcccgtcagg gcatggaagg
+      841 cgacacgcca gaagccgaat agattcccgt tcgccaaatc gccgaagccc gcccgcaagg
+      901 gcggtacagg ttccacaagg agctgcttca ccactccacc ctgcaaagcc ctaaaacgct
+      961 ctcagaacgc acgtaagcca tttttccgcc caaagcccac gtgagcccgt agaacgtcaa
+     1021 aaaacgcgtc aaaacgcgtt ttattgcgtt ttacgggtga tttcgtgggt cttgccggac
+     1081 tggttcacca ggacggctag aggcggagta ctccgattat ccagactgat ctcatctctc
+     1141 aaattcgtga aattagagag atgcgcactt atatgtttcc tcgccgttgg ctcagaaaca
+     1201 tgtgcggcct gcggcgctaa aacccgtctg gcaggtggtt gcgctcactg cgtgaacaca
+     1261 accaccttcc ccaatttttt ttgatcggtg cgttggcaac aaaaaaat
+//

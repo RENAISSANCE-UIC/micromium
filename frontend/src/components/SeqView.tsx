@@ -1,6 +1,7 @@
 import { useRef, useMemo, useEffect, useCallback, useState } from 'react'
 import { VariableSizeList, type ListChildComponentProps } from 'react-window'
 import { useSelection } from '../hooks/useSelection'
+import { FilterChips } from './FilterChips'
 import type { DocumentDTO, SelectionDTO, FeatureDTO } from '../types'
 
 function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
@@ -394,12 +395,14 @@ function SelectionHUD({ selection, bases, features }: {
     : null
   const isReverse = feat?.direction === 'reverse'
   const rawSlice  = hasSelection ? bases.slice(selection!.start, selection!.end) : ''
-  const exportSeq = (senseMode && isReverse) ? reverseComplement(rawSlice) : rawSlice
+  // showRC: for reverse features sense=RC, for forward features sense=raw (toggle inverts)
+  const showRC    = feat ? (isReverse ? senseMode : !senseMode) : false
+  const exportSeq = showRC ? reverseComplement(rawSlice) : rawSlice
   const gc = hasSelection ? gcPercent(rawSlice) : '—'
   const tm = hasSelection ? tmCelsius(rawSlice)  : '—'
 
   const fastaLabel = feat
-    ? (isReverse && senseMode
+    ? (showRC
         ? `complement(${selection!.start + 1}..${selection!.end})`
         : `${selection!.start + 1}..${selection!.end}`)
     : `${(selection?.start ?? 0) + 1}..${selection?.end ?? 0}`
@@ -430,15 +433,15 @@ function SelectionHUD({ selection, bases, features }: {
             <span style={hudValueStyle}>{tm}</span>
           </span>
           <div style={{ display: 'flex', gap: 4, paddingRight: 6 }}>
-            {isReverse && (
+            {feat && (
               <button
                 onClick={() => setSenseMode(m => !m)}
                 title={senseMode
-                  ? 'Exporting sense strand (RC). Click for raw genomic.'
-                  : 'Exporting raw genomic strand. Click for sense.'}
+                  ? 'Exporting 5′→3′ sense strand. Click to export complement.'
+                  : 'Exporting complement. Click for 5′→3′ sense strand.'}
                 style={{ ...hudBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
               >
-                {senseMode ? '5′→3′ sense' : '3′→5′ raw'}
+                {senseMode ? '5′→3′ sense' : '3′→5′ RC'}
               </button>
             )}
             <button onClick={handleCopy} style={hudBtnStyle}>
@@ -478,135 +481,6 @@ const hudBtnStyle:   React.CSSProperties = {
   padding: '1px 6px', fontSize: 10, borderRadius: 3,
   border: '1px solid #ccc', background: '#fff',
   cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
-}
-
-// --- FilterChips ---
-
-const PRESET_TYPES = ['CDS', 'AMR', 'IS element', 'oriT', 'oriV', 'misc_feature']
-const MAX_CHIPS = 10
-
-function deriveTypeOrder(features: FeatureDTO[]): string[] {
-  const inDoc = new Set(features.filter(f => f.type !== 'source').map(f => f.type))
-  const preset = PRESET_TYPES.filter(t => inDoc.has(t))
-  const rest   = [...inDoc].filter(t => !PRESET_TYPES.includes(t)).sort()
-  return [...preset, ...rest]
-}
-
-function FilterChips({ features, hiddenTypes, onToggle, basesLength, onJumpToBp }: {
-  features:    FeatureDTO[]
-  hiddenTypes: Set<string>
-  onToggle:    (type: string) => void
-  basesLength: number
-  onJumpToBp:  (bp: number) => void
-}) {
-  const [expanded, setExpanded] = useState(false)
-  const [jumpVal, setJumpVal]   = useState('')
-
-  const typeOrder = useMemo(() => deriveTypeOrder(features), [features])
-
-  const countByType = useMemo(() => {
-    const m: Record<string, number> = {}
-    for (const f of features) {
-      if (f.type === 'source') continue
-      m[f.type] = (m[f.type] ?? 0) + 1
-    }
-    return m
-  }, [features])
-
-  const colorByType = useMemo(() => {
-    const m: Record<string, string> = {}
-    for (const f of features) {
-      if (f.type === 'source') continue
-      if (!m[f.type]) m[f.type] = f.fwdColor || '#888'
-    }
-    return m
-  }, [features])
-
-  if (typeOrder.length === 0) return null
-
-  const overflow     = typeOrder.length - MAX_CHIPS
-  const visibleTypes = expanded || overflow <= 0 ? typeOrder : typeOrder.slice(0, MAX_CHIPS)
-
-  return (
-    <div style={chipBarStyle}>
-      {visibleTypes.map(type => {
-        const hidden = hiddenTypes.has(type)
-        const color  = colorByType[type] ?? '#888'
-        const count  = countByType[type] ?? 0
-        return (
-          <button
-            key={type}
-            onClick={() => onToggle(type)}
-            title={hidden ? `Show ${type}` : `Hide ${type}`}
-            style={{
-              display: 'inline-flex', alignItems: 'center',
-              padding: '1px 7px', fontSize: 10, borderRadius: 10,
-              border: `1.5px solid ${color}`,
-              background: hidden ? 'transparent' : color,
-              color: hidden ? color : '#1a1a1a',
-              fontWeight: hidden ? 400 : 600,
-              cursor: 'pointer',
-              fontFamily: 'system-ui, sans-serif',
-              whiteSpace: 'nowrap',
-              lineHeight: '16px',
-              textShadow: hidden ? 'none' : '0 0 3px rgba(255,255,255,0.5)',
-            }}
-          >
-            {type} ({count})
-          </button>
-        )
-      })}
-      {overflow > 0 && (
-        <button
-          onClick={() => setExpanded(e => !e)}
-          style={{
-            display: 'inline-flex', alignItems: 'center',
-            padding: '1px 7px', fontSize: 10, borderRadius: 10,
-            border: '1.5px solid #aaa', background: 'transparent',
-            color: '#666', cursor: 'pointer',
-            fontFamily: 'system-ui, sans-serif',
-            whiteSpace: 'nowrap', lineHeight: '16px',
-          }}
-        >
-          {expanded ? 'less' : `+${overflow} more`}
-        </button>
-      )}
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-        <label style={{ fontSize: 10, color: '#999', fontFamily: 'system-ui, sans-serif', whiteSpace: 'nowrap' }}>
-          Go to bp:
-        </label>
-        <input
-          type="number"
-          min={1}
-          max={basesLength}
-          value={jumpVal}
-          onChange={e => setJumpVal(e.target.value)}
-          onKeyDown={e => {
-            if (e.key !== 'Enter') return
-            const raw = parseInt(jumpVal, 10)
-            if (!isNaN(raw)) onJumpToBp(Math.max(1, Math.min(basesLength, raw)))
-            setJumpVal('')
-          }}
-          placeholder="bp"
-          style={{
-            width: 72, fontSize: 10, padding: '1px 4px', borderRadius: 3,
-            border: '1px solid #ccc', fontFamily: 'monospace',
-            outline: 'none',
-          }}
-        />
-      </div>
-    </div>
-  )
-}
-
-const chipBarStyle: React.CSSProperties = {
-  flexShrink: 0,
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 4,
-  padding: '4px 8px',
-  borderBottom: '1px solid #e0e0e0',
-  background: '#fafafa',
 }
 
 // --- SeqView ---

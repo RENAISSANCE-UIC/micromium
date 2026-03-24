@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { fetchSequence } from '../api'
 import { genomeFeatureLightColor } from '../lib/cgviewJson'
 import { useSelection } from '../hooks/useSelection'
+import { FilterChips } from './FilterChips'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
 // ---- Layout constants (mirror SeqView) -----------------------------------
@@ -243,6 +244,16 @@ interface Props { doc: DocumentDTO; alwaysShow?: boolean; genomeMode?: boolean }
 export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
   const { selection, publish } = useSelection('seqpanel')
 
+  const [hiddenTypes, setHiddenTypes] = useState<Set<string>>(new Set())
+  const toggleType = useCallback((type: string) => {
+    setHiddenTypes(prev => {
+      const next = new Set(prev)
+      if (next.has(type)) next.delete(type)
+      else next.add(type)
+      return next
+    })
+  }, [])
+
   const [state, setState] = useState<{
     gStart:    number   // genomic start of window (0-indexed)
     gEnd:      number   // genomic end of window (exclusive)
@@ -283,11 +294,12 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
   // Reset orientation when feature changes
   useEffect(() => { setSenseMode(true); setCopied(false) }, [state?.featId])
 
-  // Derive export sequence: RC for reverse-strand features in sense mode
   const feat      = state ? doc.features.find(f => f.id === state.featId) ?? null : null
   const isReverse = feat?.direction === 'reverse'
-  const exportBases = (senseMode && isReverse) ? reverseComplement(state?.bases ?? '') : (state?.bases ?? '')
-  const fastaCoords = (isReverse && senseMode)
+  // showRC: for reverse features sense=RC, for forward features sense=raw (toggle inverts)
+  const showRC      = isReverse ? senseMode : !senseMode
+  const exportBases = showRC ? reverseComplement(state?.bases ?? '') : (state?.bases ?? '')
+  const fastaCoords = showRC
     ? `complement(${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0})`
     : `${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0}`
   const fastaStr = state
@@ -306,10 +318,15 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
     downloadFasta(`${state.label}.fasta`, fastaStr)
   }
 
+  const visibleFeatures = useMemo(
+    () => doc.features.filter(f => !hiddenTypes.has(f.type)),
+    [doc.features, hiddenTypes],
+  )
+
   const layouts = useMemo(() => {
     if (!state) return []
-    return buildLocalLayouts(doc.features, state.gStart, state.gEnd)
-  }, [doc.features, state])
+    return buildLocalLayouts(visibleFeatures, state.gStart, state.gEnd)
+  }, [visibleFeatures, state])
 
   const onFeatClick = (feat: FeatureDTO) => {
     publish({
@@ -358,17 +375,15 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
             {state.truncated && <span style={{ color: '#aaa', marginLeft: 8 }}>(truncated)</span>}
           </span>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
-            {isReverse && (
-              <button
-                onClick={() => setSenseMode(m => !m)}
-                title={senseMode
-                  ? 'Exporting sense strand (RC of genomic). Click to export raw genomic strand.'
-                  : 'Exporting raw genomic strand. Click to export sense strand (RC).'}
-                style={{ ...exportBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
-              >
-                {senseMode ? '5′→3′ sense' : '3′→5′ raw'}
-              </button>
-            )}
+            <button
+              onClick={() => setSenseMode(m => !m)}
+              title={senseMode
+                ? 'Exporting 5′→3′ sense strand. Click to export complement.'
+                : 'Exporting complement. Click for 5′→3′ sense strand.'}
+              style={{ ...exportBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
+            >
+              {senseMode ? '5′→3′ sense' : '3′→5′ RC'}
+            </button>
             <button onClick={handleCopy} style={exportBtnStyle}>
               {copied ? 'Copied ✓' : 'Copy FASTA'}
             </button>
@@ -378,6 +393,14 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
           </div>
         </div>
       )}
+
+      {/* Type filter chips — genome palette matches table swatches */}
+      <FilterChips
+        features={doc.features}
+        hiddenTypes={hiddenTypes}
+        onToggle={toggleType}
+        colorForType={genomeFeatureLightColor}
+      />
 
       {/* Sequence body */}
       <div style={{
