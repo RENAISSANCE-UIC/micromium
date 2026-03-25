@@ -11,8 +11,8 @@ Built in Go with an Electron frontend.
 ## What it does
 
 - Opens GenBank (`.gb`, `.gbk`) and FASTA files via native file dialog
-- **Plasmid mode** (< 50 kb): circular map with feature arcs, tooltips, tick marks
-- **Genome mode** (≥ 50 kb): interactive CGView.js viewer with zoom, rotate, linear/circular toggle
+- **Plasmid mode** (< 20,000 bp): circular map with feature arcs, tooltips, tick marks
+- **Genome mode** (≥ 20,000 bp): interactive CGView.js viewer with zoom, rotate, linear/circular toggle
 - Sortable feature table with cross-highlighting between views
 - Sequence panel (plasmid mode)
 
