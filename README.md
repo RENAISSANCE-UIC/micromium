@@ -14,7 +14,9 @@ Built in Go with an Electron frontend.
 - **Plasmid mode** (< 20,000 bp): circular map with feature arcs, tooltips, tick marks
 - **Genome mode** (≥ 20,000 bp): interactive CGView.js viewer with zoom, rotate, linear/circular toggle
 - Sortable feature table with cross-highlighting between views
-- Sequence panel (plasmid mode)
+- Sequence panel with GC%, Tm, FASTA export, and **in-line translation** (plasmid and genome mode)
+- **Translation** uses NCBI Table 11 (Bacterial, Archaeal and Plant Plastid Code) with alternate start codon awareness (GTG, TTG, CTG, ATT, ATC, ATA → fMet)
+- **Dark mode** toggle with persistent preference
 
 ---
 
@@ -103,8 +105,11 @@ Open any file via **File → Open** in the app.
 - Open `pSB1C3.gb` and hover over feature arcs — tooltip shows label, coords, type
 - Click a feature arc → the feature table highlights the same row
 - Click a row in the feature table → the circular map highlights the arc
+- Click a CDS feature in the sequence panel, then click **Protein** in the HUD → see the translated amino acid sequence; alternate start codons are flagged
+- Toggle the **5′→3′ sense / 3′→5′ RC** button while the protein panel is open — translation updates live
 - Open `Ecoli_NIST0056.gbk` → genome mode loads with CGView; zoom and rotate work
-- Click a CDS arc in genome mode → feature table cross-highlights
+- Click a CDS arc in genome mode → feature table cross-highlights; click **Protein** in the sequence panel header to translate
+- Click **Dark mode** in the top-right of the header to switch themes; preference is saved across sessions
 - Open any plasmid file from the `testdata/` folder to see the circular viewer
 
 ---
