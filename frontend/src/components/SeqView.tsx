@@ -1,4 +1,5 @@
 import { useRef, useMemo, useEffect, useCallback, useState } from 'react'
+import { translate } from '../lib/translate'
 import { VariableSizeList, type ListChildComponentProps } from 'react-window'
 import { useSelection } from '../hooks/useSelection'
 import { FilterChips } from './FilterChips'
@@ -383,11 +384,15 @@ function SelectionHUD({ selection, bases, features }: {
   bases:     string
   features:  import('../types').FeatureDTO[]
 }) {
-  const [senseMode, setSenseMode] = useState(true)
-  const [copied,    setCopied]    = useState(false)
+  const [senseMode,        setSenseMode]        = useState(true)
+  const [copied,           setCopied]           = useState(false)
+  const [showTranslation,  setShowTranslation]  = useState(false)
+  const [copiedProtein,    setCopiedProtein]    = useState(false)
 
   // Reset when selection changes
-  useEffect(() => { setSenseMode(true); setCopied(false) }, [selection?.featureId])
+  useEffect(() => {
+    setSenseMode(true); setCopied(false); setShowTranslation(false); setCopiedProtein(false)
+  }, [selection?.featureId])
 
   const hasSelection = !!(selection && selection.start >= 0 && selection.end > selection.start)
   const feat      = hasSelection && selection!.featureId
@@ -400,6 +405,12 @@ function SelectionHUD({ selection, bases, features }: {
   const exportSeq = showRC ? reverseComplement(rawSlice) : rawSlice
   const gc = hasSelection ? gcPercent(rawSlice) : '—'
   const tm = hasSelection ? tmCelsius(rawSlice)  : '—'
+
+  // Translation (Table 11 — bacterial). Recomputes automatically when strand is toggled.
+  const translationResult = useMemo(
+    () => (hasSelection && exportSeq.length >= 3) ? translate(exportSeq) : null,
+    [hasSelection, exportSeq],
+  )
 
   const fastaLabel = feat
     ? (showRC
@@ -416,47 +427,88 @@ function SelectionHUD({ selection, bases, features }: {
     })
   }
 
+  const handleCopyProtein = () => {
+    if (!translationResult) return
+    navigator.clipboard.writeText(translationResult.protein).then(() => {
+      setCopiedProtein(true)
+      setTimeout(() => setCopiedProtein(false), 1500)
+    })
+  }
+
   return (
-    <div style={hudStyle}>
-      {hasSelection ? (
-        <>
-          <span style={{ flex: 1 }}>
-            <span style={hudLabelStyle}>pos </span>
-            <span style={hudValueStyle}>{selection!.start + 1}–{selection!.end}</span>
-            <span style={hudSepStyle}> | </span>
-            <span style={hudValueStyle}>{selection!.end - selection!.start} bp</span>
-            <span style={hudSepStyle}> | </span>
-            <span style={hudLabelStyle}>GC </span>
-            <span style={hudValueStyle}>{gc}</span>
-            <span style={hudSepStyle}> | </span>
-            <span style={hudLabelStyle}>Tm </span>
-            <span style={hudValueStyle}>{tm}</span>
-          </span>
-          <div style={{ display: 'flex', gap: 4, paddingRight: 6 }}>
-            {feat && (
-              <button
-                onClick={() => setSenseMode(m => !m)}
-                title={senseMode
-                  ? 'Exporting 5′→3′ sense strand. Click to export complement.'
-                  : 'Exporting complement. Click for 5′→3′ sense strand.'}
-                style={{ ...hudBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
-              >
-                {senseMode ? '5′→3′ sense' : '3′→5′ RC'}
+    <div>
+      <div style={hudStyle}>
+        {hasSelection ? (
+          <>
+            <span style={{ flex: 1 }}>
+              <span style={hudLabelStyle}>pos </span>
+              <span style={hudValueStyle}>{selection!.start + 1}–{selection!.end}</span>
+              <span style={hudSepStyle}> | </span>
+              <span style={hudValueStyle}>{selection!.end - selection!.start} bp</span>
+              <span style={hudSepStyle}> | </span>
+              <span style={hudLabelStyle}>GC </span>
+              <span style={hudValueStyle}>{gc}</span>
+              <span style={hudSepStyle}> | </span>
+              <span style={hudLabelStyle}>Tm </span>
+              <span style={hudValueStyle}>{tm}</span>
+            </span>
+            <div style={{ display: 'flex', gap: 4, paddingRight: 6 }}>
+              {feat && (
+                <button
+                  onClick={() => setSenseMode(m => !m)}
+                  title={senseMode
+                    ? 'Exporting 5′→3′ sense strand. Click to export complement.'
+                    : 'Exporting complement. Click for 5′→3′ sense strand.'}
+                  style={{ ...hudBtnStyle, color: senseMode ? '#2a7a2a' : '#888' }}
+                >
+                  {senseMode ? '5′→3′ sense' : '3′→5′ RC'}
+                </button>
+              )}
+              <button onClick={handleCopy} style={hudBtnStyle}>
+                {copied ? 'Copied ✓' : 'Copy FASTA'}
               </button>
+              <button
+                onClick={() => downloadFasta(`${fastaName}.fasta`, fastaStr)}
+                style={hudBtnStyle}
+              >
+                ↓ .fasta
+              </button>
+              <button
+                onClick={() => setShowTranslation(t => !t)}
+                disabled={!translationResult}
+                title="Translate using NCBI Table 11 (bacterial)"
+                style={{ ...hudBtnStyle, color: showTranslation ? '#2a7a2a' : '#444' }}
+              >
+                Protein
+              </button>
+            </div>
+          </>
+        ) : (
+          <span style={{ color: '#aaa' }}>No selection</span>
+        )}
+      </div>
+
+      {showTranslation && translationResult && (
+        <div style={proteinPanelStyle}>
+          <span style={{ color: '#999', flexShrink: 0 }}>
+            {translationResult.protein.length} aa
+            {translationResult.altStart && (
+              <span title="Non-ATG start codon (Table 11 bacterial alt start)" style={{ color: '#b8860b', marginLeft: 6 }}>alt start</span>
             )}
-            <button onClick={handleCopy} style={hudBtnStyle}>
-              {copied ? 'Copied ✓' : 'Copy FASTA'}
-            </button>
-            <button
-              onClick={() => downloadFasta(`${fastaName}.fasta`, fastaStr)}
-              style={hudBtnStyle}
-            >
-              ↓ .fasta
-            </button>
-          </div>
-        </>
-      ) : (
-        <span style={{ color: '#aaa' }}>No selection</span>
+            {translationResult.partial && (
+              <span style={{ color: '#c0392b', marginLeft: 6 }}>partial</span>
+            )}
+          </span>
+          <span style={{
+            flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
+            color: '#1a1a1a', letterSpacing: 0.5,
+          }}>
+            {translationResult.protein}
+          </span>
+          <button onClick={handleCopyProtein} style={{ ...hudBtnStyle, flexShrink: 0, marginRight: 6 }}>
+            {copiedProtein ? 'Copied ✓' : 'Copy AA'}
+          </button>
+        </div>
       )}
     </div>
   )
@@ -481,6 +533,13 @@ const hudBtnStyle:   React.CSSProperties = {
   padding: '1px 6px', fontSize: 10, borderRadius: 3,
   border: '1px solid #ccc', background: '#fff',
   cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
+}
+const proteinPanelStyle: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 8,
+  padding: '3px 10px',
+  fontSize: 11, fontFamily: 'monospace',
+  background: '#f0f9f0', borderTop: '1px solid #c8e0c8',
+  userSelect: 'none',
 }
 
 // --- SeqView ---

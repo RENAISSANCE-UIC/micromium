@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { fetchSequence } from '../api'
+import { translate } from '../lib/translate'
 import { genomeFeatureLightColor } from '../lib/cgviewJson'
 import { useSelection } from '../hooks/useSelection'
 import { FilterChips } from './FilterChips'
@@ -264,8 +265,10 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
     span:      string
   } | null>(null)
   const [loading, setLoading]   = useState(false)
-  const [senseMode, setSenseMode] = useState(true)
-  const [copied, setCopied]       = useState(false)
+  const [senseMode,       setSenseMode]       = useState(true)
+  const [copied,          setCopied]          = useState(false)
+  const [showTranslation, setShowTranslation] = useState(false)
+  const [copiedProtein,   setCopiedProtein]   = useState(false)
 
   useEffect(() => {
     if (!selection || selection.start < 0 || !selection.featureId) {
@@ -291,14 +294,23 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
       .catch(() => setLoading(false))
   }, [selection, doc])
 
-  // Reset orientation when feature changes
-  useEffect(() => { setSenseMode(true); setCopied(false) }, [state?.featId])
+  // Reset orientation and translation when feature changes
+  useEffect(() => {
+    setSenseMode(true); setCopied(false); setShowTranslation(false); setCopiedProtein(false)
+  }, [state?.featId])
 
   const feat      = state ? doc.features.find(f => f.id === state.featId) ?? null : null
   const isReverse = feat?.direction === 'reverse'
   // showRC: for reverse features sense=RC, for forward features sense=raw (toggle inverts)
   const showRC      = isReverse ? senseMode : !senseMode
   const exportBases = showRC ? reverseComplement(state?.bases ?? '') : (state?.bases ?? '')
+
+  // Translation (Table 11 — bacterial). Recomputes when strand is toggled.
+  const translationResult = useMemo(
+    () => (exportBases.length >= 3) ? translate(exportBases) : null,
+    [exportBases],
+  )
+
   const fastaCoords = showRC
     ? `complement(${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0})`
     : `${(state?.gStart ?? 0) + 1}..${state?.gEnd ?? 0}`
@@ -316,6 +328,14 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
   const handleDownload = () => {
     if (!state) return
     downloadFasta(`${state.label}.fasta`, fastaStr)
+  }
+
+  const handleCopyProtein = () => {
+    if (!translationResult) return
+    navigator.clipboard.writeText(translationResult.protein).then(() => {
+      setCopiedProtein(true)
+      setTimeout(() => setCopiedProtein(false), 1500)
+    })
   }
 
   const visibleFeatures = useMemo(
@@ -389,6 +409,14 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
             </button>
             <button onClick={handleDownload} style={exportBtnStyle}>
               ↓ .fasta
+            </button>
+            <button
+              onClick={() => setShowTranslation(t => !t)}
+              disabled={!translationResult}
+              title="Translate using NCBI Table 11 (bacterial)"
+              style={{ ...exportBtnStyle, color: showTranslation ? '#2a7a2a' : '#444' }}
+            >
+              Protein
             </button>
           </div>
         </div>
@@ -520,6 +548,36 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
           <span style={{ color: '#aaa' }}>No selection</span>
         )}
       </div>
+
+      {/* Protein panel */}
+      {showTranslation && translationResult && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '3px 10px', flexShrink: 0,
+          fontSize: 11, fontFamily: 'monospace',
+          background: '#f0f9f0', borderTop: '1px solid #c8e0c8',
+          userSelect: 'none',
+        }}>
+          <span style={{ color: '#999', flexShrink: 0 }}>
+            {translationResult.protein.length} aa
+            {translationResult.altStart && (
+              <span title="Non-ATG start codon (Table 11 bacterial alt start)" style={{ color: '#b8860b', marginLeft: 6 }}>alt start</span>
+            )}
+            {translationResult.partial && (
+              <span style={{ color: '#c0392b', marginLeft: 6 }}>partial</span>
+            )}
+          </span>
+          <span style={{
+            flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
+            color: '#1a1a1a', letterSpacing: 0.5,
+          }}>
+            {translationResult.protein}
+          </span>
+          <button onClick={handleCopyProtein} style={{ ...exportBtnStyle, flexShrink: 0 }}>
+            {copiedProtein ? 'Copied ✓' : 'Copy AA'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
