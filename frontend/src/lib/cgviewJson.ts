@@ -14,7 +14,6 @@ const PALETTE: Record<string, string> = {
   rRNA:          '#2ecc71',
   tmRNA:         '#e74c3c',
   repeat_region: '#f39c12',
-  gene:          '#95a5a6',
   other:         '#7f8c8d',
 }
 
@@ -37,7 +36,7 @@ export function genomeFeatureLightColor(type: string): string {
 const NCRNA_TYPES = new Set(['tRNA', 'rRNA', 'tmRNA', 'repeat_region'])
 
 // Feature types that get arrow decoration (driven via legend item in CGView 1.8)
-const ARROW_TYPES = new Set(['CDS', 'gene'])
+const ARROW_TYPES = new Set(['CDS'])
 
 // ---- Public builder ---------------------------------------------------------
 
@@ -52,11 +51,8 @@ export function buildCGViewJSON(doc: DocumentDTO): object {
   const featureObjects: object[] = []
   const legendSeen = new Set<string>()
 
-  const hasCDSFeature = doc.features.some(f => f.type === 'CDS')
-
   for (const feat of doc.features) {
     if (feat.type === 'source') continue
-    if (feat.type === 'gene' && hasCDSFeature) continue
     if (feat.spans.length === 0) continue
 
     const start  = feat.spans[0].start + 1          // CGView is 1-indexed

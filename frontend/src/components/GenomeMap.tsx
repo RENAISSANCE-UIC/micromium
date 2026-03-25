@@ -11,7 +11,7 @@ const TRACK_RATIOS: Record<string, number> = {
 }
 
 // Arrow-decoration backstop — CGView 1.8 drives decoration via legend item
-const ARROW_LEGEND_NAMES = new Set(['CDS', 'gene'])
+const ARROW_LEGEND_NAMES = new Set(['CDS'])
 
 interface GenomeMapProps { doc: DocumentDTO }
 
@@ -65,7 +65,7 @@ export function GenomeMap({ doc }: GenomeMapProps) {
       viewer.ruler.tickWidth    = 2
     } catch (_) { /* silent */ }
 
-    // 3. Arrow decoration backstop on CDS/gene legend items
+    // 3. Arrow decoration backstop on CDS legend items
     try {
       const items = viewer.legend.items()
       for (const item of items) {

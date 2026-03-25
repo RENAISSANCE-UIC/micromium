@@ -11,7 +11,7 @@ import (
 // GenomeThreshold is the sequence length above which a document is treated as
 // a microbial genome rather than a plasmid. Bases are omitted from the DTO
 // for genome-mode documents to avoid multi-MB wire payloads.
-const GenomeThreshold = 50_000
+const GenomeThreshold = 20_000
 
 // RecordDTO describes one LOCUS record within a multi-record GenBank file.
 type RecordDTO struct {
@@ -64,13 +64,26 @@ type ErrorDTO struct {
 }
 
 func documentToDTO(doc *app.Document, allDocs []*app.Document, activeIdx int) DocumentDTO {
-	features := make([]FeatureDTO, len(doc.Features))
-	for i, f := range doc.Features {
+	// Suppress 'gene' features when CDS annotations are present — gene is
+	// redundant with CDS in standard GenBank files and clutters the displays.
+	hasCDS := false
+	for _, f := range doc.Features {
+		if string(f.Type) == "CDS" {
+			hasCDS = true
+			break
+		}
+	}
+
+	var features []FeatureDTO
+	for _, f := range doc.Features {
+		if hasCDS && string(f.Type) == "gene" {
+			continue
+		}
 		spans := make([]SpanDTO, len(f.Spans))
 		for j, s := range f.Spans {
 			spans[j] = SpanDTO{Start: s.Start, End: s.End}
 		}
-		features[i] = FeatureDTO{
+		features = append(features, FeatureDTO{
 			ID:        f.ID,
 			Label:     f.Label,
 			Type:      string(f.Type),
@@ -78,7 +91,10 @@ func documentToDTO(doc *app.Document, allDocs []*app.Document, activeIdx int) Do
 			Direction: directionString(f.Direction),
 			FwdColor:  hexColor(f.FwdColor),
 			RevColor:  hexColor(f.RevColor),
-		}
+		})
+	}
+	if features == nil {
+		features = []FeatureDTO{}
 	}
 	length := doc.Sequence.Length()
 	mode := "plasmid"
