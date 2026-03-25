@@ -48,9 +48,9 @@ function parseHex(hex: string): [number, number, number] {
 
 interface TooltipState { x: number; y: number; feat: FeatureDTO }
 
-interface CircMapProps { doc: DocumentDTO }
+interface CircMapProps { doc: DocumentDTO; dark?: boolean }
 
-export function CircMap({ doc }: CircMapProps) {
+export function CircMap({ doc, dark = false }: CircMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef    = useRef<HTMLCanvasElement>(null)
   const { selection, publish } = useSelection('circmap')
@@ -81,6 +81,9 @@ export function CircMap({ doc }: CircMapProps) {
     const canvas = canvasRef.current
     if (!canvas || canvasSize === 0) return
     const ctx = canvas.getContext('2d')!
+    const cv = dark
+      ? { bg: '#222222', text: '#e0e0e0', text2: '#888888', tick: '#555555', lbl: '#666666', lead: '#444444' }
+      : { bg: '#f5f5f5', text: '#1a1a1a', text2: '#888888', tick: '#bbbbbb', lbl: '#aaaaaa', lead: '#cccccc' }
     const w = canvas.width
     const h = canvas.height
 
@@ -140,14 +143,14 @@ export function CircMap({ doc }: CircMapProps) {
     for (let bp = interval; bp < total; bp += interval) {
       const a   = bpToAngle(bp, total)
       const cos = Math.cos(a), sin = Math.sin(a)
-      ctx.strokeStyle = '#bbb'
+      ctx.strokeStyle = cv.tick
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.moveTo(cx + (radius - TICK_LEN) * cos, cy - (radius - TICK_LEN) * sin)
       ctx.lineTo(cx + radius * cos,               cy - radius * sin)
       ctx.stroke()
       ctx.font = '9px system-ui, sans-serif'
-      ctx.fillStyle = '#aaa'
+      ctx.fillStyle = cv.lbl
       ctx.fillText(String(bp), cx + (radius - TICK_LABEL_R) * cos, cy - (radius - TICK_LABEL_R) * sin)
     }
 
@@ -206,7 +209,7 @@ export function CircMap({ doc }: CircMapProps) {
       const lx   = cx + labelR * Math.cos(angle)
       const ly   = cy - labelR * Math.sin(angle)
 
-      ctx.strokeStyle = '#ccc'
+      ctx.strokeStyle = cv.lead
       ctx.lineWidth   = 0.8
       ctx.beginPath()
       ctx.moveTo(arcX, arcY)
@@ -221,10 +224,10 @@ export function CircMap({ doc }: CircMapProps) {
       ctx.font = 'bold 11px system-ui, sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.strokeStyle = '#f5f5f5'
+      ctx.strokeStyle = cv.bg
       ctx.lineWidth = 3
       ctx.strokeText(text, lx, ly)
-      ctx.fillStyle = '#1a1a1a'
+      ctx.fillStyle = cv.text
       ctx.fillText(text, lx, ly)
     })
 
@@ -233,13 +236,13 @@ export function CircMap({ doc }: CircMapProps) {
     ctx.textBaseline = 'middle'
     const nameLabel = doc.name.length > 18 ? doc.name.slice(0, 17) + '…' : doc.name
     ctx.font = 'bold 13px system-ui, sans-serif'
-    ctx.fillStyle = '#1a1a1a'
+    ctx.fillStyle = cv.text
     ctx.fillText(nameLabel, cx, cy - 9)
     ctx.font = '11px system-ui, sans-serif'
-    ctx.fillStyle = '#888'
+    ctx.fillStyle = cv.text2
     ctx.fillText(`${doc.length.toLocaleString()} bp · ${doc.topology}`, cx, cy + 9)
 
-  }, [doc, fwdCov, revCov, selection, canvasSize])
+  }, [doc, fwdCov, revCov, selection, canvasSize, dark])
 
   // D3: hover checks both rings
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -324,7 +327,7 @@ export function CircMap({ doc }: CircMapProps) {
           onClick={handleClick}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          style={{ cursor: 'crosshair', background: '#f5f5f5' }}
+          style={{ cursor: 'crosshair', background: 'var(--cv-bg)' }}
         />
       )}
       {tooltip && (
@@ -332,20 +335,20 @@ export function CircMap({ doc }: CircMapProps) {
           position: 'absolute',
           left: tooltip.x + 14,
           top:  tooltip.y - 10,
-          background: '#fff',
-          border: '1px solid #d0d0d0',
+          background: 'var(--bg-hud)',
+          border: '1px solid var(--border)',
           borderRadius: 4,
           padding: '4px 8px',
           fontSize: 12,
           fontFamily: 'system-ui, sans-serif',
           pointerEvents: 'none',
           boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-          color: '#1a1a1a',
+          color: 'var(--text)',
           whiteSpace: 'nowrap',
           zIndex: 10,
         }}>
           <div style={{ fontWeight: 600 }}>{tooltip.feat.label}</div>
-          <div style={{ color: '#666', fontSize: 11 }}>
+          <div style={{ color: 'var(--text-2)', fontSize: 11 }}>
             {tooltip.feat.type} · {tooltip.feat.spans[0].start + 1}–{tooltip.feat.spans[tooltip.feat.spans.length - 1].end}
           </div>
         </div>

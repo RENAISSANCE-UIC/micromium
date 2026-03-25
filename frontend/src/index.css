@@ -1,0 +1,86 @@
+/* ── Micromium design tokens ── */
+
+:root {
+  /* backgrounds */
+  --bg:           #ffffff;
+  --bg-panel:     #f8f8f8;
+  --bg-hud:       #f5f5f5;
+  --bg-filter:    #fafafa;
+  --bg-protein:   #f0f9f0;
+  --bg-strip:     #fdf6e3;   /* record-selector warning strip */
+
+  /* borders */
+  --border:       #d0d0d0;
+  --border-lt:    #e0e0e0;
+  --border-row:   #ebebeb;
+  --border-prot:  #c8e0c8;
+  --border-strip: #e8d8a0;
+
+  /* text */
+  --text:         #1a1a1a;
+  --text-2:       #666666;
+  --text-3:       #999999;
+  --text-4:       #888888;
+  --text-strip:   #7a5c00;
+
+  /* buttons */
+  --btn-bg:       #ffffff;
+  --btn-bg2:      #ebebeb;
+  --btn-bd:       #cccccc;
+  --btn-txt:      #444444;
+
+  /* canvas (CircMap) */
+  --cv-bg:        #f5f5f5;
+  --cv-text:      #1a1a1a;
+  --cv-tick:      #bbbbbb;
+  --cv-lbl:       #aaaaaa;
+  --cv-lead:      #cccccc;
+}
+
+:root.dark {
+  /* backgrounds */
+  --bg:           #1a1a1a;
+  --bg-panel:     #222222;
+  --bg-hud:       #1e1e1e;
+  --bg-filter:    #252525;
+  --bg-protein:   #1a2a1a;
+  --bg-strip:     #2a2600;
+
+  /* borders */
+  --border:       #3a3a3a;
+  --border-lt:    #2d2d2d;
+  --border-row:   #2a2a2a;
+  --border-prot:  #2a3d2a;
+  --border-strip: #3a3000;
+
+  /* text */
+  --text:         #e0e0e0;
+  --text-2:       #888888;
+  --text-3:       #606060;
+  --text-4:       #777777;
+  --text-strip:   #c8a800;
+
+  /* buttons */
+  --btn-bg:       #2a2a2a;
+  --btn-bg2:      #333333;
+  --btn-bd:       #444444;
+  --btn-txt:      #cccccc;
+
+  /* canvas (CircMap) */
+  --cv-bg:        #222222;
+  --cv-text:      #e0e0e0;
+  --cv-tick:      #555555;
+  --cv-lbl:       #666666;
+  --cv-lead:      #444444;
+}
+
+/* Let the browser know we support both schemes (fixes native inputs in dark mode) */
+:root       { color-scheme: light; }
+:root.dark  { color-scheme: dark; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}

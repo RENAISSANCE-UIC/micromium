@@ -46,15 +46,15 @@ const stripStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 10,
   padding: '4px 16px',
-  background: '#fdf6e3',
-  borderBottom: '1px solid #e8d8a0',
+  background: 'var(--bg-strip)',
+  borderBottom: '1px solid var(--border-strip)',
   flexShrink: 0,
   flexWrap: 'wrap',
 }
 
 const labelStyle: React.CSSProperties = {
   fontSize: 12,
-  color: '#7a5c00',
+  color: 'var(--text-strip)',
   fontWeight: 500,
   whiteSpace: 'nowrap',
 }
@@ -102,6 +102,6 @@ const nameStyle: React.CSSProperties = {
 }
 
 const sizeStyle: React.CSSProperties = {
-  color: '#666',
+  color: 'var(--text-2)',
   fontSize: 11,
 }

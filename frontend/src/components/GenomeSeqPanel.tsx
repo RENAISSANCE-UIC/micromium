@@ -169,7 +169,7 @@ function Tick({ col, label }: { col: number; label: string }) {
       transform: 'translateX(-100%)',
       display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
     }}>
-      <div style={{ width: 1, height: 4, background: '#b0b0b0' }} />
+      <div style={{ width: 1, height: 4, background: 'var(--border)' }} />
       <span style={{ fontSize: 9, whiteSpace: 'nowrap', lineHeight: 1 }}>{label}</span>
     </div>
   )
@@ -361,7 +361,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
     return (
       <div style={{
         flex: '1 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: '#f8f8f8', color: '#bbb', fontSize: 12, fontFamily: 'monospace',
+        background: 'var(--bg-panel)', color: 'var(--text-3)', fontSize: 12, fontFamily: 'monospace',
         userSelect: 'none',
       }}>
         Select a feature to view its sequence
@@ -373,8 +373,8 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
 
   return (
     <div style={{
-      borderTop:  alwaysShow ? 'none' : '1px solid #d0d0d0',
-      background: '#f8f8f8',
+      borderTop:  alwaysShow ? 'none' : '1px solid var(--border)',
+      background: 'var(--bg-panel)',
       flexShrink: alwaysShow ? undefined : 0,
       flex:       alwaysShow ? '1 1 auto' : undefined,
       display:    alwaysShow ? 'flex' : undefined,
@@ -386,13 +386,13 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
       {state && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '4px 10px 4px 14px', borderBottom: '1px solid #e8e8e8',
+          padding: '4px 10px 4px 14px', borderBottom: '1px solid var(--border-lt)',
           flexShrink: 0,
         }}>
-          <span style={{ fontSize: 12, color: '#555', fontFamily: 'monospace' }}>
-            <strong style={{ color: '#1a1a1a' }}>{state.label}</strong>
+          <span style={{ fontSize: 12, color: 'var(--text-2)', fontFamily: 'monospace' }}>
+            <strong style={{ color: 'var(--text)' }}>{state.label}</strong>
             {'  '}{state.span}
-            {state.truncated && <span style={{ color: '#aaa', marginLeft: 8 }}>(truncated)</span>}
+            {state.truncated && <span style={{ color: 'var(--text-3)', marginLeft: 8 }}>(truncated)</span>}
           </span>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
             <button
@@ -414,7 +414,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
               onClick={() => setShowTranslation(t => !t)}
               disabled={!translationResult}
               title="Translate using NCBI Table 11 (bacterial)"
-              style={{ ...exportBtnStyle, color: showTranslation ? '#2a7a2a' : '#444' }}
+              style={{ ...exportBtnStyle, color: showTranslation ? '#4caf50' : 'var(--btn-txt)' }}
             >
               Protein
             </button>
@@ -442,7 +442,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
         minHeight:  0,
       }}>
         {loading ? (
-          <span style={{ color: '#aaa' }}>Loading…</span>
+          <span style={{ color: 'var(--text-3)' }}>Loading…</span>
         ) : state && layouts.map((layout, li) => {
           const localStart = li * BASES_PER_LINE
           const localEnd   = Math.min(localStart + BASES_PER_LINE, state.bases.length)
@@ -459,7 +459,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
                 height: SEQ_HEIGHT, lineHeight: `${SEQ_HEIGHT}px`,
               }}>
                 <span style={{
-                  color: '#909090', width: GUTTER_W, textAlign: 'right',
+                  color: 'var(--text-4)', width: GUTTER_W, textAlign: 'right',
                   marginRight: GUTTER_MX, flexShrink: 0,
                 }}>
                   {gFirst1}
@@ -476,7 +476,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
                 height: SEQ_HEIGHT, lineHeight: `${SEQ_HEIGHT}px`,
               }}>
                 <span style={{ width: GUTTER_W, marginRight: GUTTER_MX, flexShrink: 0 }} />
-                <span style={{ color: '#888' }}>{revSlice}</span>
+                <span style={{ color: 'var(--text-4)' }}>{revSlice}</span>
               </div>
 
               {/* Position ruler — genomic coordinates */}
@@ -484,7 +484,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
                 position: 'relative', height: RULER_HEIGHT,
                 marginLeft: `calc(${GUTTER_W} + ${GUTTER_MX}px)`,
                 fontSize: 12, fontFamily: 'monospace',
-                color: '#909090', userSelect: 'none',
+                color: 'var(--text-4)', userSelect: 'none',
               }}>
                 {li === 0 && <Tick col={0} label={String(state.gStart + 1)} />}
                 {Array.from({ length: localEnd - localStart }, (_, col) => {
@@ -527,25 +527,25 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
         flexShrink: 0, height: 26,
         display: 'flex', alignItems: 'center', paddingLeft: 10,
         fontSize: 11, fontFamily: 'monospace',
-        background: '#f5f5f5', borderTop: '1px solid #d0d0d0',
+        background: 'var(--bg-hud)', borderTop: '1px solid var(--border)',
         userSelect: 'none',
       }}>
         {state ? (
           <span>
-            <span style={{ color: '#999' }}>pos </span>
-            <span style={{ color: '#222' }}>{state.gStart + 1}–{state.gEnd}</span>
-            <span style={{ color: '#ccc' }}> | </span>
-            <span style={{ color: '#222' }}>{state.gEnd - state.gStart} bp</span>
+            <span style={{ color: 'var(--text-3)' }}>pos </span>
+            <span style={{ color: 'var(--text)' }}>{state.gStart + 1}–{state.gEnd}</span>
+            <span style={{ color: 'var(--border)' }}> | </span>
+            <span style={{ color: 'var(--text)' }}>{state.gEnd - state.gStart} bp</span>
             {state.truncated && <span style={{ color: '#aaa', marginLeft: 6 }}>(truncated)</span>}
-            <span style={{ color: '#ccc' }}> | </span>
-            <span style={{ color: '#999' }}>GC </span>
-            <span style={{ color: '#222' }}>{gcPercent(state.bases)}</span>
-            <span style={{ color: '#ccc' }}> | </span>
-            <span style={{ color: '#999' }}>Tm </span>
-            <span style={{ color: '#222' }}>{tmCelsius(state.bases)}</span>
+            <span style={{ color: 'var(--border)' }}> | </span>
+            <span style={{ color: 'var(--text-3)' }}>GC </span>
+            <span style={{ color: 'var(--text)' }}>{gcPercent(state.bases)}</span>
+            <span style={{ color: 'var(--border)' }}> | </span>
+            <span style={{ color: 'var(--text-3)' }}>Tm </span>
+            <span style={{ color: 'var(--text)' }}>{tmCelsius(state.bases)}</span>
           </span>
         ) : (
-          <span style={{ color: '#aaa' }}>No selection</span>
+          <span style={{ color: 'var(--text-3)' }}>No selection</span>
         )}
       </div>
 
@@ -555,10 +555,10 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
           display: 'flex', alignItems: 'center', gap: 8,
           padding: '3px 10px', flexShrink: 0,
           fontSize: 11, fontFamily: 'monospace',
-          background: '#f0f9f0', borderTop: '1px solid #c8e0c8',
+          background: 'var(--bg-protein)', borderTop: '1px solid var(--border-prot)',
           userSelect: 'none',
         }}>
-          <span style={{ color: '#999', flexShrink: 0 }}>
+          <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>
             {translationResult.protein.length} aa
             {translationResult.altStart && (
               <span title="Non-ATG start codon (Table 11 bacterial alt start)" style={{ color: '#b8860b', marginLeft: 6 }}>alt start</span>
@@ -569,7 +569,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
           </span>
           <span style={{
             flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
-            color: '#1a1a1a', letterSpacing: 0.5,
+            color: 'var(--text)', letterSpacing: 0.5,
           }}>
             {translationResult.protein}
           </span>
@@ -584,6 +584,6 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
 
 const exportBtnStyle: React.CSSProperties = {
   padding: '2px 7px', fontSize: 11, borderRadius: 3,
-  border: '1px solid #ccc', background: '#fff',
-  cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
+  border: '1px solid var(--btn-bd)', background: 'var(--btn-bg)',
+  cursor: 'pointer', color: 'var(--btn-txt)', whiteSpace: 'nowrap',
 }

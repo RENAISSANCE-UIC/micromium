@@ -43,7 +43,7 @@ function baseColors(bp: number, selection: SelectionDTO | null): [string, string
   if (selection && selection.start >= 0 && bp >= selection.start && bp < selection.end) {
     return ['#000000', '#FFCC00']
   }
-  return ['#1a1a1a', 'transparent']
+  return ['var(--text)', 'transparent']
 }
 
 // --- Annotation layout ---
@@ -151,7 +151,7 @@ function Tick({ col, label }: { col: number; label: string }) {
       flexDirection: 'column',
       alignItems: 'flex-end',
     }}>
-      <div style={{ width: 1, height: 4, background: '#b0b0b0' }} />
+      <div style={{ width: 1, height: 4, background: 'var(--border)' }} />
       <span style={{ fontSize: 9, whiteSpace: 'nowrap', lineHeight: 1 }}>{label}</span>
     </div>
   )
@@ -273,22 +273,22 @@ function Row({ index, style, data }: ListChildComponentProps<RowData>) {
       {/* Forward (sense) strand */}
       <div style={{ display: 'flex', alignItems: 'center',
                     height: SEQ_HEIGHT, lineHeight: `${SEQ_HEIGHT}px` }}>
-        <span style={{ color: '#909090', width: GUTTER_WIDTH, textAlign: 'right',
+        <span style={{ color: 'var(--text-4)', width: GUTTER_WIDTH, textAlign: 'right',
                        marginRight: GUTTER_MARGIN, flexShrink: 0 }}>
           {lineStart + 1}
         </span>
         {fwdSegments.map((s, idx) => (
           <span key={idx} style={{ color: s.fg, background: s.bg }}>{s.text}</span>
         ))}
-        <span style={{ color: '#909090', marginLeft: 6, flexShrink: 0 }}>{lineEnd}</span>
+        <span style={{ color: 'var(--text-4)', marginLeft: 6, flexShrink: 0 }}>{lineEnd}</span>
       </div>
 
       {/* Reverse (antisense) strand — immediately below forward */}
       <div style={{ display: 'flex', alignItems: 'center',
                     height: SEQ_HEIGHT, lineHeight: `${SEQ_HEIGHT}px` }}>
-        <span style={{ color: '#909090', width: GUTTER_WIDTH, textAlign: 'right',
+        <span style={{ color: 'var(--text-4)', width: GUTTER_WIDTH, textAlign: 'right',
                        marginRight: GUTTER_MARGIN, flexShrink: 0 }} />
-        <span style={{ color: '#888888' }}>{revSlice}</span>
+        <span style={{ color: 'var(--text-4)' }}>{revSlice}</span>
       </div>
 
       {/* Position ruler — fontSize MUST match the sequence row (12px) so ch units align */}
@@ -298,7 +298,7 @@ function Row({ index, style, data }: ListChildComponentProps<RowData>) {
         marginLeft: `calc(${GUTTER_WIDTH} + ${GUTTER_MARGIN}px)`,
         fontSize: 12,
         fontFamily: 'monospace',
-        color: '#909090',
+        color: 'var(--text-4)',
         userSelect: 'none',
       }}>
         {/* Tick at bp=1 (only on the first row) */}
@@ -477,20 +477,20 @@ function SelectionHUD({ selection, bases, features }: {
                 onClick={() => setShowTranslation(t => !t)}
                 disabled={!translationResult}
                 title="Translate using NCBI Table 11 (bacterial)"
-                style={{ ...hudBtnStyle, color: showTranslation ? '#2a7a2a' : '#444' }}
+                style={{ ...hudBtnStyle, color: showTranslation ? '#4caf50' : 'var(--btn-txt)' }}
               >
                 Protein
               </button>
             </div>
           </>
         ) : (
-          <span style={{ color: '#aaa' }}>No selection</span>
+          <span style={{ color: 'var(--text-3)' }}>No selection</span>
         )}
       </div>
 
       {showTranslation && translationResult && (
         <div style={proteinPanelStyle}>
-          <span style={{ color: '#999', flexShrink: 0 }}>
+          <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>
             {translationResult.protein.length} aa
             {translationResult.altStart && (
               <span title="Non-ATG start codon (Table 11 bacterial alt start)" style={{ color: '#b8860b', marginLeft: 6 }}>alt start</span>
@@ -501,7 +501,7 @@ function SelectionHUD({ selection, bases, features }: {
           </span>
           <span style={{
             flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
-            color: '#1a1a1a', letterSpacing: 0.5,
+            color: 'var(--text)', letterSpacing: 0.5,
           }}>
             {translationResult.protein}
           </span>
@@ -522,23 +522,23 @@ const hudStyle: React.CSSProperties = {
   paddingLeft: 10,
   fontSize: 11,
   fontFamily: 'monospace',
-  background: '#f5f5f5',
-  borderTop: '1px solid #d0d0d0',
+  background: 'var(--bg-hud)',
+  borderTop: '1px solid var(--border)',
   userSelect: 'none',
 }
-const hudLabelStyle: React.CSSProperties = { color: '#999' }
-const hudValueStyle: React.CSSProperties = { color: '#222' }
-const hudSepStyle:   React.CSSProperties = { color: '#ccc' }
+const hudLabelStyle: React.CSSProperties = { color: 'var(--text-3)' }
+const hudValueStyle: React.CSSProperties = { color: 'var(--text)' }
+const hudSepStyle:   React.CSSProperties = { color: 'var(--border)' }
 const hudBtnStyle:   React.CSSProperties = {
   padding: '1px 6px', fontSize: 10, borderRadius: 3,
-  border: '1px solid #ccc', background: '#fff',
-  cursor: 'pointer', color: '#444', whiteSpace: 'nowrap',
+  border: '1px solid var(--btn-bd)', background: 'var(--btn-bg)',
+  cursor: 'pointer', color: 'var(--btn-txt)', whiteSpace: 'nowrap',
 }
 const proteinPanelStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 8,
   padding: '3px 10px',
   fontSize: 11, fontFamily: 'monospace',
-  background: '#f0f9f0', borderTop: '1px solid #c8e0c8',
+  background: 'var(--bg-protein)', borderTop: '1px solid var(--border-prot)',
   userSelect: 'none',
 }
 

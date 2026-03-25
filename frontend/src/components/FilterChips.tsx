@@ -101,7 +101,7 @@ export function FilterChips({ features, hiddenTypes, onToggle, basesLength, onJu
       {/* Jump-to-bp — only when a virtual list is available */}
       {basesLength !== undefined && onJumpToBp && (
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          <label style={{ fontSize: 10, color: '#999', fontFamily: 'system-ui, sans-serif', whiteSpace: 'nowrap' }}>
+          <label style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'system-ui, sans-serif', whiteSpace: 'nowrap' }}>
             Go to bp:
           </label>
           <input
@@ -119,7 +119,8 @@ export function FilterChips({ features, hiddenTypes, onToggle, basesLength, onJu
             placeholder="bp"
             style={{
               width: 72, fontSize: 10, padding: '1px 4px', borderRadius: 3,
-              border: '1px solid #ccc', fontFamily: 'monospace', outline: 'none',
+              border: '1px solid var(--btn-bd)', fontFamily: 'monospace', outline: 'none',
+              background: 'var(--btn-bg)', color: 'var(--text)',
             }}
           />
         </div>
@@ -144,21 +145,21 @@ const barStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 4,
   padding: '4px 8px',
-  borderBottom: '1px solid #e0e0e0',
-  background: '#fafafa',
+  borderBottom: '1px solid var(--border-lt)',
+  background: 'var(--bg-filter)',
 }
 
 const moreBtn: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center',
   padding: '1px 7px', fontSize: 10, borderRadius: 10,
-  border: '1.5px solid #aaa', background: 'transparent',
-  color: '#666', cursor: 'pointer',
+  border: '1.5px solid var(--btn-bd)', background: 'transparent',
+  color: 'var(--text-2)', cursor: 'pointer',
   fontFamily: 'system-ui, sans-serif',
   whiteSpace: 'nowrap', lineHeight: '16px',
 }
 
 const collapseBtn: React.CSSProperties = {
   fontSize: 10, background: 'transparent', border: 'none',
-  color: '#999', cursor: 'pointer', fontFamily: 'system-ui, sans-serif',
+  color: 'var(--text-3)', cursor: 'pointer', fontFamily: 'system-ui, sans-serif',
   padding: 0,
 }

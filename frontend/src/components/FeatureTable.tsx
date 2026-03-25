@@ -90,7 +90,7 @@ export function FeatureTable({ doc }: FeatureTableProps) {
           style={searchInputStyle}
         />
         {query && (
-          <span style={{ fontSize: 11, color: '#999', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
             {filtered.length} / {doc.features.length}
           </span>
         )}
@@ -142,11 +142,11 @@ export function FeatureTable({ doc }: FeatureTableProps) {
                   }} />
                 </td>
                 <td style={tdStyle}>{feat.label}</td>
-                <td style={{ ...tdStyle, color: '#666' }}>{feat.type}</td>
+                <td style={{ ...tdStyle, color: 'var(--text-2)' }}>{feat.type}</td>
                 <td style={tdStyle}>{featStart(feat) + 1}</td>
                 <td style={tdStyle}>{featEnd(feat)}</td>
                 <td style={tdStyle}>{featLen(feat)}</td>
-                <td style={{ ...tdStyle, color: '#666' }}>{featDir(feat)}</td>
+                <td style={{ ...tdStyle, color: 'var(--text-2)' }}>{featDir(feat)}</td>
               </tr>
             )
           })}
@@ -162,19 +162,20 @@ const tableStyle: React.CSSProperties = {
 }
 const thStyle: React.CSSProperties = {
   textAlign: 'left', padding: '4px 8px',
-  borderBottom: '1px solid #d0d0d0', color: '#666',
-  position: 'sticky', top: 0, background: '#f5f5f5',
+  borderBottom: '1px solid var(--border)', color: 'var(--text-2)',
+  position: 'sticky', top: 0, background: 'var(--bg-hud)',
   whiteSpace: 'nowrap',
 }
 const tdStyle: React.CSSProperties = {
-  padding: '3px 8px', borderBottom: '1px solid #ebebeb',
+  padding: '3px 8px', borderBottom: '1px solid var(--border-row)',
 }
 const searchBarStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 8,
-  padding: '6px 8px', borderBottom: '1px solid #d0d0d0',
-  background: '#f5f5f5', flexShrink: 0,
+  padding: '6px 8px', borderBottom: '1px solid var(--border)',
+  background: 'var(--bg-hud)', flexShrink: 0,
 }
 const searchInputStyle: React.CSSProperties = {
   flex: 1, fontSize: 12, padding: '3px 6px',
-  border: '1px solid #ccc', borderRadius: 3, outline: 'none',
+  border: '1px solid var(--btn-bd)', borderRadius: 3, outline: 'none',
+  background: 'var(--btn-bg)', color: 'var(--text)',
 }

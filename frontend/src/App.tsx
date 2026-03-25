@@ -22,6 +22,18 @@ export default function App() {
   const [doc, setDoc] = useState<DocumentDTO | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem('micromium-dark') === 'true'
+    if (saved) document.documentElement.classList.add('dark')
+    return saved
+  })
+
+  const toggleDark = () => {
+    const next = !dark
+    setDark(next)
+    document.documentElement.classList.toggle('dark', next)
+    localStorage.setItem('micromium-dark', String(next))
+  }
   const [circmapWidth, setCircmapWidth] = useState(CIRCMAP_DEFAULT)
   const [seqPanelWidth, setSeqPanelWidth] = useState(SEQPANEL_DEFAULT)
   const [tableHeight, setTableHeight] = useState(TABLE_DEFAULT)
@@ -107,19 +119,22 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg)', color: 'var(--text)' }}>
 
       {/* Header */}
       <div style={headerStyle}>
         <span style={{ fontWeight: 600, fontSize: 15 }}>Micromium</span>
         <button onClick={handleOpen} style={btnStyle}>Open file…</button>
         {doc && (
-          <span style={{ color: '#666', fontSize: 13 }}>
+          <span style={{ color: 'var(--text-2)', fontSize: 13 }}>
             {doc.name} · {doc.length.toLocaleString()} bp · {doc.topology}
           </span>
         )}
         {error  && <span style={{ color: '#c0392b', fontSize: 13 }}>{error}</span>}
-        {loading && <span style={{ color: '#666', fontSize: 13 }}>Loading…</span>}
+        {loading && <span style={{ color: 'var(--text-2)', fontSize: 13 }}>Loading…</span>}
+        <button onClick={toggleDark} style={{ ...btnStyle, marginLeft: 'auto' }}>
+          {dark ? 'Light mode' : 'Dark mode'}
+        </button>
       </div>
 
       {doc !== null && (doc.records?.length ?? 0) > 1 && (
@@ -139,7 +154,7 @@ export default function App() {
                 <div style={{ width: seqPanelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: '1px solid #d0d0d0' }}>
                   <GenomeSeqPanel doc={doc} alwaysShow genomeMode />
                 </div>
-                <div onMouseDown={startSeqPanelDrag} style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: '#d0d0d0' }} />
+                <div onMouseDown={startSeqPanelDrag} style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: 'var(--border)' }} />
                 <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}>
                   <GenomeMap doc={doc} />
                 </div>
@@ -158,13 +173,13 @@ export default function App() {
                 </div>
                 <div
                   onMouseDown={startCircmapDrag}
-                  style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: '#d0d0d0' }}
+                  style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: 'var(--border)' }}
                 />
                 <div style={{
                   width: circmapWidth, flexShrink: 0, overflow: 'hidden',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <CircMap doc={doc} />
+                  <CircMap doc={doc} dark={dark} />
                 </div>
               </div>
               <div onMouseDown={startVDrag} style={rowResizeHandle} />
@@ -195,21 +210,21 @@ export default function App() {
 
 const headerStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 16,
-  padding: '6px 16px', borderBottom: '1px solid #2d2d2d', flexShrink: 0,
+  padding: '6px 16px', borderBottom: '1px solid var(--border)', flexShrink: 0,
 }
 const btnStyle: React.CSSProperties = {
-  padding: '3px 10px', borderRadius: 4, border: '1px solid #bbb',
-  background: '#ebebeb', color: '#1a1a1a', cursor: 'pointer', fontSize: 13,
+  padding: '3px 10px', borderRadius: 4, border: '1px solid var(--btn-bd)',
+  background: 'var(--btn-bg2)', color: 'var(--text)', cursor: 'pointer', fontSize: 13,
 }
 const splashStyle: React.CSSProperties = {
   flex: '1 1 auto',
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
 }
 const rowResizeHandle: React.CSSProperties = {
-  height: 4, flexShrink: 0, cursor: 'row-resize', background: '#d0d0d0',
+  height: 4, flexShrink: 0, cursor: 'row-resize', background: 'var(--border)',
 }
 const splashBtnStyle: React.CSSProperties = {
-  padding: '10px 28px', borderRadius: 6, border: '1px solid #bbb',
-  background: '#1a1a1a', color: '#f5f5f5', cursor: 'pointer',
+  padding: '10px 28px', borderRadius: 6, border: '1px solid var(--btn-bd)',
+  background: 'var(--text)', color: 'var(--bg)', cursor: 'pointer',
   fontSize: 15, fontWeight: 600,
 }
