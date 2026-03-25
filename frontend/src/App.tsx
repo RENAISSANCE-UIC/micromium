@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { fetchDocument, openFile } from './api'
+import { fetchDocument, openFile, selectRecord } from './api'
 import { CircMap } from './components/CircMap'
 import { GenomeMap } from './components/GenomeMap'
 import { GenomeSeqPanel } from './components/GenomeSeqPanel'
 import { SeqView } from './components/SeqView'
 import { FeatureTable } from './components/FeatureTable'
+import { RecordSelector } from './components/RecordSelector'
 import type { DocumentDTO } from './types'
 
 const CIRCMAP_MIN = 200
@@ -96,6 +97,15 @@ export default function App() {
     }
   }
 
+  const handleSelectRecord = async (index: number) => {
+    setError(null)
+    try {
+      setDoc(await selectRecord(index))
+    } catch (e) {
+      setError(String(e))
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
@@ -111,6 +121,14 @@ export default function App() {
         {error  && <span style={{ color: '#c0392b', fontSize: 13 }}>{error}</span>}
         {loading && <span style={{ color: '#666', fontSize: 13 }}>Loading…</span>}
       </div>
+
+      {doc !== null && (doc.records?.length ?? 0) > 1 && (
+        <RecordSelector
+          records={doc.records}
+          activeIndex={doc.recordIndex}
+          onSelect={handleSelectRecord}
+        />
+      )}
 
       {doc ? (
         <>

@@ -13,6 +13,13 @@ export interface FeatureDTO {
   revColor: string  // "#RRGGBB"
 }
 
+export interface RecordDTO {
+  index: number
+  name: string
+  length: number
+  mode: 'plasmid' | 'genome'
+}
+
 export interface DocumentDTO {
   name: string
   length: number
@@ -20,6 +27,8 @@ export interface DocumentDTO {
   bases: string  // empty string when mode === 'genome'
   mode: 'plasmid' | 'genome'
   features: FeatureDTO[]
+  recordIndex: number   // index of this record in records[]
+  records: RecordDTO[]  // all records from the file; len > 1 means multi-record
 }
 
 export interface SelectionDTO {

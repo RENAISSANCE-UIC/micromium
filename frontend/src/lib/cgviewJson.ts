@@ -52,8 +52,11 @@ export function buildCGViewJSON(doc: DocumentDTO): object {
   const featureObjects: object[] = []
   const legendSeen = new Set<string>()
 
+  const hasCDSFeature = doc.features.some(f => f.type === 'CDS')
+
   for (const feat of doc.features) {
     if (feat.type === 'source') continue
+    if (feat.type === 'gene' && hasCDSFeature) continue
     if (feat.spans.length === 0) continue
 
     const start  = feat.spans[0].start + 1          // CGView is 1-indexed
@@ -95,8 +98,8 @@ export function buildCGViewJSON(doc: DocumentDTO): object {
   const typesPresent = new Set(legendSeen)
 
   // CDS track — straddles backbone, strand-split
-  const hasCDS = [...ARROW_TYPES].some(t => typesPresent.has(t))
-  if (hasCDS) {
+  const hasCDSTrack = [...ARROW_TYPES].some(t => typesPresent.has(t))
+  if (hasCDSTrack) {
     tracks.push({
       name:               'CDS',
       separateFeaturesBy: 'strand',

@@ -41,3 +41,14 @@ export async function openFile(path: string): Promise<DocumentDTO> {
   if (!r.ok) throw new Error(await r.text())
   return r.json()
 }
+
+export async function selectRecord(index: number): Promise<DocumentDTO> {
+  const base = await baseUrl()
+  const r = await fetch(`${base}/api/document/select`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ index }),
+  })
+  if (!r.ok) throw new Error(await r.text())
+  return r.json()
+}

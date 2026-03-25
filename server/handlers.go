@@ -8,14 +8,14 @@ import (
 
 func (s *Server) handleDocument(w http.ResponseWriter, r *http.Request) {
 	s.mu.RLock()
-	doc := s.doc
+	doc, allDocs, idx := s.doc, s.allDocs, s.docIdx
 	s.mu.RUnlock()
 
 	if doc == nil {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	writeJSON(w, documentToDTO(doc))
+	writeJSON(w, documentToDTO(doc, allDocs, idx))
 }
 
 func (s *Server) handleDocumentOpen(w http.ResponseWriter, r *http.Request) {
@@ -31,9 +31,32 @@ func (s *Server) handleDocumentOpen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.mu.RLock()
-	doc := s.doc
+	doc, allDocs, idx := s.doc, s.allDocs, s.docIdx
 	s.mu.RUnlock()
-	writeJSON(w, documentToDTO(doc))
+	writeJSON(w, documentToDTO(doc, allDocs, idx))
+}
+
+func (s *Server) handleDocumentSelect(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Index int `json:"index"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	s.mu.Lock()
+	if body.Index < 0 || body.Index >= len(s.allDocs) {
+		s.mu.Unlock()
+		writeError(w, http.StatusBadRequest, "record index out of range")
+		return
+	}
+	s.docIdx = body.Index
+	s.doc = s.allDocs[body.Index]
+	doc, allDocs, idx := s.doc, s.allDocs, s.docIdx
+	s.mu.Unlock()
+
+	writeJSON(w, documentToDTO(doc, allDocs, idx))
 }
 
 func (s *Server) handleSequence(w http.ResponseWriter, r *http.Request) {

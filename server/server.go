@@ -15,11 +15,13 @@ import (
 
 // Server holds document state and serves the HTTP + WebSocket API.
 type Server struct {
-	mu   sync.RWMutex
-	doc  *app.Document
-	hub  *Hub
-	mux  *http.ServeMux
-	port int // set after binding, injected into index.html
+	mu      sync.RWMutex
+	doc     *app.Document    // currently active record
+	allDocs []*app.Document  // all records from the last opened file, sorted largest-first
+	docIdx  int              // index of doc within allDocs
+	hub     *Hub
+	mux     *http.ServeMux
+	port    int // set after binding, injected into index.html
 }
 
 // New creates a Server with no document loaded.
@@ -32,6 +34,7 @@ func New() *Server {
 
 	s.mux.HandleFunc("GET /api/document", s.handleDocument)
 	s.mux.HandleFunc("POST /api/document/open", s.handleDocumentOpen)
+	s.mux.HandleFunc("POST /api/document/select", s.handleDocumentSelect)
 	s.mux.HandleFunc("GET /api/document/sequence", s.handleSequence)
 	s.mux.HandleFunc("GET /ws", s.hub.ServeWS)
 
@@ -83,6 +86,8 @@ func (s *Server) ServeStatic(dir string) {
 }
 
 // LoadFile parses a GenBank or FASTA file and stores it as the current document.
+// For multi-record GenBank files all records are retained; the largest (chromosome)
+// is made the active record.
 func (s *Server) LoadFile(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -91,7 +96,8 @@ func (s *Server) LoadFile(path string) error {
 	defer f.Close()
 
 	ext := strings.ToLower(filepath.Ext(path))
-	doc := &app.Document{Path: path}
+
+	var allDocs []*app.Document
 
 	switch ext {
 	case ".fa", ".fasta", ".fna":
@@ -99,18 +105,18 @@ func (s *Server) LoadFile(path string) error {
 		if err != nil {
 			return err
 		}
-		doc.Sequence = *seq
+		allDocs = []*app.Document{{Path: path, Sequence: *seq}}
 	default: // .gb, .gbk, .ape
-		seq, features, err := bio.ParseGenBank(f)
+		allDocs, err = parseAllGenBankRecords(f, path)
 		if err != nil {
 			return err
 		}
-		doc.Sequence = *seq
-		doc.Features = features
 	}
 
 	s.mu.Lock()
-	s.doc = doc
+	s.allDocs = allDocs
+	s.docIdx = 0
+	s.doc = allDocs[0]
 	s.mu.Unlock()
 	return nil
 }

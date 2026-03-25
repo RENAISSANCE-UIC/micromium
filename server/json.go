@@ -13,14 +13,24 @@ import (
 // for genome-mode documents to avoid multi-MB wire payloads.
 const GenomeThreshold = 50_000
 
+// RecordDTO describes one LOCUS record within a multi-record GenBank file.
+type RecordDTO struct {
+	Index  int    `json:"index"`  // position in the sorted record list
+	Name   string `json:"name"`
+	Length int    `json:"length"`
+	Mode   string `json:"mode"`  // "plasmid" | "genome"
+}
+
 // DocumentDTO is the JSON representation of an open document.
 type DocumentDTO struct {
-	Name     string       `json:"name"`
-	Length   int          `json:"length"`
-	Topology string       `json:"topology"` // "circular" | "linear"
-	Bases    string       `json:"bases"`    // empty when Mode == "genome"
-	Mode     string       `json:"mode"`     // "plasmid" | "genome"
-	Features []FeatureDTO `json:"features"`
+	Name        string       `json:"name"`
+	Length      int          `json:"length"`
+	Topology    string       `json:"topology"`    // "circular" | "linear"
+	Bases       string       `json:"bases"`       // empty when Mode == "genome"
+	Mode        string       `json:"mode"`        // "plasmid" | "genome"
+	Features    []FeatureDTO `json:"features"`
+	RecordIndex int          `json:"recordIndex"` // index of this record in Records
+	Records     []RecordDTO  `json:"records"`     // all records; len>1 means multi-record file
 }
 
 // FeatureDTO is the JSON representation of a single feature annotation.
@@ -53,7 +63,7 @@ type ErrorDTO struct {
 	Error string `json:"error"`
 }
 
-func documentToDTO(doc *app.Document) DocumentDTO {
+func documentToDTO(doc *app.Document, allDocs []*app.Document, activeIdx int) DocumentDTO {
 	features := make([]FeatureDTO, len(doc.Features))
 	for i, f := range doc.Features {
 		spans := make([]SpanDTO, len(f.Spans))
@@ -77,13 +87,31 @@ func documentToDTO(doc *app.Document) DocumentDTO {
 		mode = "genome"
 		bases = ""
 	}
+
+	records := make([]RecordDTO, len(allDocs))
+	for i, d := range allDocs {
+		rLen := d.Sequence.Length()
+		rMode := "plasmid"
+		if rLen >= GenomeThreshold {
+			rMode = "genome"
+		}
+		records[i] = RecordDTO{
+			Index:  i,
+			Name:   d.Sequence.Name,
+			Length: rLen,
+			Mode:   rMode,
+		}
+	}
+
 	return DocumentDTO{
-		Name:     doc.Sequence.Name,
-		Length:   length,
-		Topology: topologyString(doc.Sequence.Topology),
-		Bases:    bases,
-		Mode:     mode,
-		Features: features,
+		Name:        doc.Sequence.Name,
+		Length:      length,
+		Topology:    topologyString(doc.Sequence.Topology),
+		Bases:       bases,
+		Mode:        mode,
+		Features:    features,
+		RecordIndex: activeIdx,
+		Records:     records,
 	}
 }
 
