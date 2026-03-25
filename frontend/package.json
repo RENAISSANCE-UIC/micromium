@@ -21,16 +21,19 @@
       "electron/dist/**/*",
       "package.json"
     ],
-    "extraResources": [
-      {
-        "from": "../micromiumserver",
-        "to": "micromiumserver"
-      }
-    ],
     "linux": {
       "target": ["AppImage"],
       "category": "Science",
-      "executableArgs": ["--no-sandbox"]
+      "executableArgs": ["--no-sandbox"],
+      "extraResources": [
+        { "from": "../micromiumserver", "to": "micromiumserver" }
+      ]
+    },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "extraResources": [
+        { "from": "../micromiumserver.exe", "to": "micromiumserver.exe" }
+      ]
     }
   },
   "devDependencies": {

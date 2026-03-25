@@ -8,12 +8,13 @@ let backendPort: number | null = null
 let mainWindow: BrowserWindow | null = null
 
 function getBinaryPath(): string {
+  const bin = process.platform === 'win32' ? 'micromiumserver.exe' : 'micromiumserver'
   if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'micromiumserver')
+    return path.join(process.resourcesPath, bin)
   }
   // Dev: electron/dist/main.js → __dirname = frontend/electron/dist
   // Three levels up = project root
-  return path.join(__dirname, '..', '..', '..', 'micromiumserver')
+  return path.join(__dirname, '..', '..', '..', bin)
 }
 
 function startBackend(): Promise<number> {
