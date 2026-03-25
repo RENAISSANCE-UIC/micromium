@@ -3,6 +3,9 @@
 A cross-platform plasmid and genome viewer for GenBank files, inspired by
 [ApE (A Plasmid Editor)](https://jorgensen.biology.utah.edu/wayned/ape/).
 Built in Go with an Electron frontend.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19225286.svg)](https://doi.org/10.5281/zenodo.19225286)
+
+
 
 > **Alpha software.** Core viewing works. Editing, saving, and packaging are not yet complete.
 
