@@ -1,11 +1,10 @@
 # Micromium
 
-A plasmid and genome viewer for GenBank files. Micromium is a Go reimplementation of the core
-[ApE (A Plasmid Editor)](https://jorgensen.biology.utah.edu/wayned/ape/) experience,
-with a native desktop UI via Electron.
+A cross-platform plasmid and genome viewer for GenBank files, inspired by
+[ApE (A Plasmid Editor)](https://jorgensen.biology.utah.edu/wayned/ape/).
+Built in Go with an Electron frontend.
 
 > **Alpha software.** Core viewing works. Editing, saving, and packaging are not yet complete.
-> Linux only at this stage.
 
 ---
 
@@ -31,30 +30,71 @@ with a native desktop UI via Electron.
 
 ## Quick start
 
+### Linux
+
 ```bash
 git clone git@github.com:RENAISSANCE-UIC/micromium.git
 cd micromium
 ./build/dev.sh
 ```
 
-That's it. `dev.sh` installs Node deps, builds the frontend, compiles the Go server, and launches Electron.
+`dev.sh` installs Node deps, builds the frontend, compiles the Go server, and launches Electron.
 
 > **Note:** On most Linux systems Electron requires `--no-sandbox`. This flag is already set in `dev.sh`.
 > If you get a sandbox error, make sure you're running `./build/dev.sh` rather than invoking Electron directly.
+
+### Windows
+
+```powershell
+git clone git@github.com:RENAISSANCE-UIC/micromium.git
+cd micromium
+.\build\build-windows.ps1
+```
+
+Produces an NSIS installer in `frontend\dist-electron\`. Requires Go and Node.js 20+ on your PATH.
 
 ---
 
 ## Test files
 
-Two plasmid files and one genome file are included in `testdata/`:
+A set of ATCC reference genomes and plasmids is included in `testdata/`:
 
-| File | Size | Mode |
-|------|------|------|
-| `pSB1C3.gb` | 2,070 bp | Plasmid (circular map) |
-| `pSB1C3_I0500_LasI.gb` | ~5 kb | Plasmid (circular map) |
-| `Ecoli_NIST0056.gbk` | 5.3 Mbp, 4,560 features | Genome (CGView) |
+**Plasmids**
 
-Open any of them via **File → Open** in the app, or drag-and-drop (plasmid files only).
+| File | Size | Notes |
+|------|------|-------|
+| `pSB1C3.gb` | 2,070 bp | iGEM BioBrick backbone |
+| `pSB1C3_I0500_LasI.gb` | ~5 kb | BioBrick with LasI insert |
+
+**Microbial genomes + associated plasmids**
+
+| Organism | Chromosome file | Plasmid files |
+|----------|----------------|---------------|
+| *E. coli* K-12 MG1655 | `Ecoli_K12_MG1655.gbk` | — |
+| *E. coli* NIST 0056 | `Ecoli_NIST0056.gbk`, `Ecoli_NIST0056_pgap.gbk` | `Ecoli_NIST0056 plasmid unnamed1–4.gbk` |
+| *S. aureus* ATCC 25923 | `Saureus_ATCC25923.gbk` | `Saureus_ATCC25923_plasmidS1945.gbk` |
+| *K. pneumoniae* ATCC 13883 | `Kpneumo_ATCC13883.gbk` | `pKPHS1–6.gbk` |
+| *Enterococcus* ATCC 13047 | `Enteroc_ATCC13047.gbk` | `pECL_A.gbk`, `pECL_B.gbk` |
+
+Open any file via **File → Open** in the app.
+
+---
+
+## Screenshots
+
+**Plasmid mode** — circular map, sequence panel, and feature table
+
+![Plasmid view (pSB1C3)](docs/screenshots/plasmid_view_A.png)
+
+![Plasmid view (NIST0056 plasmid)](docs/screenshots/plasmid_view_B.png)
+
+**Genome mode** — CGView circular viewer with feature legend
+
+![Genome overview](docs/screenshots/genome_overview.png)
+
+**Genome mode** — linear zoomed view
+
+![Genome zoom view](docs/screenshots/genome_zoom_view.png)
 
 ---
 
@@ -65,14 +105,14 @@ Open any of them via **File → Open** in the app, or drag-and-drop (plasmid fil
 - Click a row in the feature table → the circular map highlights the arc
 - Open `Ecoli_NIST0056.gbk` → genome mode loads with CGView; zoom and rotate work
 - Click a CDS arc in genome mode → feature table cross-highlights
+- Open any plasmid file from the `testdata/` folder to see the circular viewer
 
 ---
 
 ## Known limitations (alpha)
 
 - **Read-only.** No saving, no feature editing, no copy/paste yet.
-- **Linux only.** macOS and Windows builds are not configured yet.
-- The packaged AppImage (Step C4) has not been smoke-tested — run from source for now.
+- The packaged installer has not been broadly smoke-tested — running from source is recommended.
 - Sequence panel is blank in genome mode (bases are omitted for large files by design).
 
 ---
@@ -85,8 +125,8 @@ app/            Application state + event bus
 server/         HTTP + WebSocket API
 frontend/       Electron + React + TypeScript
 cmd/micromium/  Go entry point
-testdata/       Sample GenBank files
-build/          dev.sh and build.sh scripts
+testdata/       Sample GenBank files (plasmids + ATCC reference genomes)
+build/          dev.sh (Linux), build.sh, build-windows.ps1
 ```
 
 ---
