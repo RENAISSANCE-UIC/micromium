@@ -83,7 +83,10 @@ func ParseGenBank(r io.Reader) (*Sequence, []Feature, error) {
 			// Detect raw sequence data appearing without an ORIGIN header.
 			// A line that is non-empty and consists entirely of DNA bases is
 			// unambiguously sequence, not a feature key or qualifier.
-			if isRawSequenceLine(line) {
+			// Guard: never trigger inside a multi-line qualifier value (e.g.
+			// /translation continuation lines whose amino acids happen to fall
+			// entirely within the DNA ambiguity-code alphabet).
+			if !inMultilineVal && isRawSequenceLine(line) {
 				flushFeature()
 				state = stOrigin
 				for _, ch := range line {
