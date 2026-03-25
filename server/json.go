@@ -35,13 +35,14 @@ type DocumentDTO struct {
 
 // FeatureDTO is the JSON representation of a single feature annotation.
 type FeatureDTO struct {
-	ID        string    `json:"id"`
-	Label     string    `json:"label"`
-	Type      string    `json:"type"`
-	Spans     []SpanDTO `json:"spans"`
-	Direction string    `json:"direction"` // "forward" | "reverse" | "none"
-	FwdColor  string    `json:"fwdColor"`  // "#RRGGBB"
-	RevColor  string    `json:"revColor"`  // "#RRGGBB"
+	ID         string              `json:"id"`
+	Label      string              `json:"label"`
+	Type       string              `json:"type"`
+	Spans      []SpanDTO           `json:"spans"`
+	Direction  string              `json:"direction"`  // "forward" | "reverse" | "none"
+	FwdColor   string              `json:"fwdColor"`   // "#RRGGBB"
+	RevColor   string              `json:"revColor"`   // "#RRGGBB"
+	Qualifiers map[string][]string `json:"qualifiers"` // raw GenBank qualifiers, e.g. /product, /db_xref
 }
 
 // SpanDTO is a half-open [Start, End) interval, 0-indexed.
@@ -83,14 +84,23 @@ func documentToDTO(doc *app.Document, allDocs []*app.Document, activeIdx int) Do
 		for j, s := range f.Spans {
 			spans[j] = SpanDTO{Start: s.Start, End: s.End}
 		}
+		quals := f.Qualifiers
+		if quals == nil {
+			quals = map[string]string{}
+		}
+		qualifiers := make(map[string][]string, len(quals))
+		for k, v := range quals {
+			qualifiers[k] = []string{v}
+		}
 		features = append(features, FeatureDTO{
-			ID:        f.ID,
-			Label:     f.Label,
-			Type:      string(f.Type),
-			Spans:     spans,
-			Direction: directionString(f.Direction),
-			FwdColor:  hexColor(f.FwdColor),
-			RevColor:  hexColor(f.RevColor),
+			ID:         f.ID,
+			Label:      f.Label,
+			Type:       string(f.Type),
+			Spans:      spans,
+			Direction:  directionString(f.Direction),
+			FwdColor:   hexColor(f.FwdColor),
+			RevColor:   hexColor(f.RevColor),
+			Qualifiers: qualifiers,
 		})
 	}
 	if features == nil {

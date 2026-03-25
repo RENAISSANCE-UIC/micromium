@@ -11,6 +11,7 @@ export interface FeatureDTO {
   direction: 'forward' | 'reverse' | 'none'
   fwdColor: string  // "#RRGGBB"
   revColor: string  // "#RRGGBB"
+  qualifiers: Record<string, string[]>  // raw GenBank qualifiers, e.g. /product, /db_xref
 }
 
 export interface RecordDTO {
