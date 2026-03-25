@@ -22,6 +22,8 @@ export default function App() {
   const [doc, setDoc] = useState<DocumentDTO | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [filePath, setFilePath] = useState<string | null>(null)
+  const [fileChangedPath, setFileChangedPath] = useState<string | null>(null)
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem('micromium-dark') === 'true'
     if (saved) document.documentElement.classList.add('dark')
@@ -52,6 +54,26 @@ export default function App() {
     fetchDocument()
       .then(d => { setDoc(d); setLoading(false) })
       .catch(e => { setError(String(e)); setLoading(false) })
+  }, [])
+
+  // OS dark mode sync and file-watch listener
+  useEffect(() => {
+    if (!window.electronAPI) return
+    const hasSavedPref = localStorage.getItem('micromium-dark') !== null
+    if (!hasSavedPref) {
+      window.electronAPI.getNativeThemeDark().then(isDark => {
+        setDark(isDark)
+        document.documentElement.classList.toggle('dark', isDark)
+      })
+    }
+    window.electronAPI.onThemeChange(isDark => {
+      if (localStorage.getItem('micromium-dark') !== null) return
+      setDark(isDark)
+      document.documentElement.classList.toggle('dark', isDark)
+    })
+    window.electronAPI.onFileChanged(changedPath => {
+      setFileChangedPath(changedPath)
+    })
   }, [])
 
   const startCircmapDrag = useCallback((e: React.MouseEvent) => {
@@ -98,16 +120,30 @@ export default function App() {
     }
   }, [])
 
-  const handleOpen = async () => {
-    const path = await window.electronAPI?.openFile()
-    if (!path) return
+  const handleOpenPath = useCallback(async (p: string) => {
     setError(null)
+    setFileChangedPath(null)
     try {
-      setDoc(await openFile(path))
+      setDoc(await openFile(p))
+      setFilePath(p)
+      await window.electronAPI?.watchFile(p)
     } catch (e) {
       setError(String(e))
     }
+  }, [])
+
+  const handleOpen = async () => {
+    const p = await window.electronAPI?.openFile()
+    if (!p) return
+    await handleOpenPath(p)
   }
+
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault() }
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0] as File & { path?: string }
+    if (file?.path) handleOpenPath(file.path)
+  }, [handleOpenPath])
 
   const handleSelectRecord = async (index: number) => {
     setError(null)
@@ -119,7 +155,11 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg)', color: 'var(--text)' }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg)', color: 'var(--text)' }}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
 
       {/* Header */}
       <div style={headerStyle}>
@@ -136,6 +176,14 @@ export default function App() {
           {dark ? 'Light mode' : 'Dark mode'}
         </button>
       </div>
+
+      {fileChangedPath && (
+        <div style={bannerStyle}>
+          <span>File changed on disk.</span>
+          <button onClick={() => handleOpenPath(fileChangedPath)} style={bannerBtnStyle}>Reload</button>
+          <button onClick={() => setFileChangedPath(null)} style={bannerBtnStyle}>Dismiss</button>
+        </div>
+      )}
 
       {doc !== null && (doc.records?.length ?? 0) > 1 && (
         <RecordSelector
@@ -193,10 +241,10 @@ export default function App() {
         /* Splash screen */
         <div style={splashStyle}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>🧬</div>
-          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: '#1a1a1a' }}>
+          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: 'var(--text)' }}>
             Open a plasmid file to begin
           </div>
-          <div style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-2)', marginBottom: 24 }}>
             GenBank (.gb, .gbk, .ape) or FASTA (.fa, .fasta, .fna)
           </div>
           <button onClick={handleOpen} style={splashBtnStyle}>Open file…</button>
@@ -227,4 +275,12 @@ const splashBtnStyle: React.CSSProperties = {
   padding: '10px 28px', borderRadius: 6, border: '1px solid var(--btn-bd)',
   background: 'var(--text)', color: 'var(--bg)', cursor: 'pointer',
   fontSize: 15, fontWeight: 600,
+}
+const bannerStyle: React.CSSProperties = {
+  background: '#b5750e', color: '#fff', padding: '4px 16px', flexShrink: 0,
+  display: 'flex', alignItems: 'center', gap: 12, fontSize: 13,
+}
+const bannerBtnStyle: React.CSSProperties = {
+  padding: '2px 10px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.45)',
+  background: 'transparent', color: '#fff', cursor: 'pointer', fontSize: 12,
 }

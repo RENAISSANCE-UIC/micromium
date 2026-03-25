@@ -45,6 +45,10 @@ declare global {
     electronAPI: {
       getPort: () => Promise<number>
       openFile: () => Promise<string | null>
+      getNativeThemeDark: () => Promise<boolean>
+      onThemeChange: (cb: (dark: boolean) => void) => void
+      watchFile: (filePath: string) => Promise<void>
+      onFileChanged: (cb: (filePath: string) => void) => void
     }
   }
 }

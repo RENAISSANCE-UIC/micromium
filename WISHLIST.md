@@ -54,6 +54,62 @@ Preset filter pills or a dropdown that narrows the feature table and sequence vi
 
 ---
 
+---
+
+## Electron Desktop-Class Features
+
+Micromium runs in Electron, which means it has access to OS-level APIs that a browser-based viewer cannot touch. The current IPC bridge is minimal — two handlers (`getPort`, `dialog:openFile`) — so there is a clean foundation to build on without unpicking anything.
+
+### Multi-Window / Detachable Panes
+
+Allow users to pop out the circular map or the sequence panel into a separate `BrowserWindow` on a second monitor, while the feature table stays on the primary screen.
+
+- Both windows connect to the same Go backend WebSocket hub, so selection sync is automatic — clicking a feature in the detached map highlights the row in the table window with no extra work
+- `ipcMain` can also relay `SelectionDTO` messages directly between renderer processes for sub-millisecond sync without a network round-trip
+- `BrowserWindow` state (position, size, open/closed) persists via `electron-store` or a simple JSON file
+
+### File System Watch / Auto-Reload
+
+Own the file rather than just opening it once.
+
+- Use Node's `fs.watch` (or the Go backend's `fsnotify`) to detect when the loaded `.gbk` is modified by an external tool
+- On change, push an IPC notification to the renderer: "File changed on disk. Refresh?" — a single `ipcMain` push event + `ipcRenderer.on` handler
+- Drag-and-drop: listen for `dragover` / `drop` on the renderer's splash screen; file path comes through `event.dataTransfer.files[0].path` in Electron (real path, unlike a browser sandbox)
+- `app.addRecentDocument(path)` adds the file to the OS recent-documents list (right-click Taskbar/Dock icon on Windows and macOS)
+
+### Native Menus & Keyboard Shortcuts
+
+Replace web-style buttons with OS-native controls.
+
+- `Menu.buildFromTemplate` constructs the top menu bar (File, View, Edit) — replaces the plain "Open file…" button for a professional feel
+- `globalShortcut.register` for cross-window shortcuts: `Cmd/Ctrl+F` → focus motif search, `Cmd/Ctrl+G` → Go to position, `+`/`-` → zoom the map, `Cmd/Ctrl+D` → toggle dark mode
+- Context menu on right-click of a feature arc or table row via `Menu.buildFromTemplate` + `menu.popup()`: "Copy protein sequence", "Copy FASTA", "Open in NCBI", "Export gene SVG"
+
+### High-Resolution Export (Publication Quality)
+
+- Render the circular map in a hidden offscreen `BrowserWindow` at 4000 × 4000 px, capture with `webContents.capturePage()`, and write to disk via `dialog.showSaveDialog`
+- Prevents the pixelated-screenshot problem in papers and posters
+- SVG export is an alternative path: serialize the canvas draw commands to SVG (a separate render pass) for infinitely scalable vector output
+- `dialog.showSaveDialog` gives a native "Save As…" sheet rather than a browser download prompt
+
+### Local Workspace Persistence (SQLite)
+
+- Use a local SQLite database (via the Go backend, which already has a process) to store per-file workspaces: custom feature colours, notes, highlighted regions, last scroll position
+- Each workspace keyed by file path + content hash so a moved file can still be matched
+- Eliminates the "re-configure every time you open a genome" friction for power users
+
+### Quick-Win Electron APIs
+
+| Feature | API | Value |
+|---------|-----|-------|
+| OS dark mode sync | `nativeTheme.shouldUseDarkColors` + `nativeTheme.on('updated')` | Auto-match the viewer theme to the OS setting instead of requiring a manual toggle |
+| System notifications | `new Notification(…)` | Alert when a long search or export finishes in the background |
+| Global shortcuts | `globalShortcut` | Navigate without the window needing focus |
+| Native save dialog | `dialog.showSaveDialog` | Professional "Save As…" for FASTA / SVG / PNG exports |
+| App badge (macOS) | `app.dock.setBadge` | Show a count of open files or a "●" when a file has changed on disk |
+
+---
+
 ## Common Prerequisite for External Links and Functional Filtering
 
 `FeatureDTO` now carries `qualifiers: Record<string, string[]>` — added 2026-03-25.

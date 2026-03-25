@@ -1,11 +1,14 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, nativeTheme } from 'electron'
 import { spawn, ChildProcess } from 'child_process'
 import * as path from 'path'
 import * as readline from 'readline'
+import * as fs from 'fs'
 
 let goProcess: ChildProcess | null = null
 let backendPort: number | null = null
 let mainWindow: BrowserWindow | null = null
+let fileWatcher: fs.FSWatcher | null = null
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 function getBinaryPath(): string {
   const bin = process.platform === 'win32' ? 'micromiumserver.exe' : 'micromiumserver'
@@ -65,6 +68,10 @@ app.whenReady().then(async () => {
 
     mainWindow.loadURL(`http://localhost:${backendPort}`)
 
+    nativeTheme.on('updated', () => {
+      mainWindow?.webContents.send('nativeTheme:updated', nativeTheme.shouldUseDarkColors)
+    })
+
     if (!app.isPackaged) {
       mainWindow.webContents.openDevTools({ mode: 'detach' })
     }
@@ -75,6 +82,23 @@ app.whenReady().then(async () => {
 })
 
 ipcMain.handle('getPort', () => backendPort)
+
+ipcMain.handle('nativeTheme:isDark', () => nativeTheme.shouldUseDarkColors)
+
+ipcMain.handle('file:watch', (_event, filePath: string) => {
+  if (fileWatcher) { fileWatcher.close(); fileWatcher = null }
+  if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
+
+  app.addRecentDocument(filePath)
+  mainWindow?.setTitle(`${path.basename(filePath)} — Micromium`)
+
+  fileWatcher = fs.watch(filePath, () => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      mainWindow?.webContents.send('file:changed', filePath)
+    }, 1500)
+  })
+})
 
 ipcMain.handle('dialog:openFile', async () => {
   if (!mainWindow) return null
@@ -95,7 +119,10 @@ function killBackend() {
   }
 }
 
-app.on('before-quit', killBackend)
+app.on('before-quit', () => {
+  killBackend()
+  if (fileWatcher) { fileWatcher.close(); fileWatcher = null }
+})
 app.on('window-all-closed', () => {
   killBackend()
   if (process.platform !== 'darwin') app.quit()
