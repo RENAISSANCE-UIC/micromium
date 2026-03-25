@@ -31,6 +31,11 @@ func parseAllGenBankRecords(r io.Reader, path string) ([]*app.Document, error) {
 		if err != nil || seq == nil {
 			return
 		}
+		// Skip CON/annotation-only records that carry no sequence data;
+		// they have no ORIGIN section and Length() == 0.
+		if seq.Length() == 0 {
+			return
+		}
 		docs = append(docs, &app.Document{
 			Path:     path,
 			Sequence: *seq,
