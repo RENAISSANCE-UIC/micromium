@@ -3,34 +3,37 @@ import { useSelection } from '../hooks/useSelection'
 import { genomeFeatureLightColor } from '../lib/cgviewJson'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
-type SortKey = 'label' | 'type' | 'start' | 'end' | 'length' | 'direction'
+type SortKey = 'label' | 'type' | 'start' | 'end' | 'length' | 'direction' | 'product'
 
 const COLUMNS: Array<{ key: SortKey | ''; label: string; width: number }> = [
-  { key: '',          label: '',     width: 22  },
-  { key: 'label',     label: 'Name', width: 160 },
-  { key: 'type',      label: 'Type', width: 110 },
-  { key: 'start',     label: 'Start', width: 72 },
-  { key: 'end',       label: 'End',   width: 72  },
-  { key: 'length',    label: 'Len',   width: 64  },
-  { key: 'direction', label: 'Dir',   width: 36  },
+  { key: '',          label: '',        width: 22  },
+  { key: 'label',     label: 'Name',    width: 130 },
+  { key: 'product',   label: 'Product', width: 200 },
+  { key: 'type',      label: 'Type',    width: 110 },
+  { key: 'start',     label: 'Start',   width: 72  },
+  { key: 'end',       label: 'End',     width: 72  },
+  { key: 'length',    label: 'Len',     width: 64  },
+  { key: 'direction', label: 'Dir',     width: 36  },
 ]
 
-function featStart(f: FeatureDTO) { return f.spans[0]?.start ?? 0 }
-function featEnd(f: FeatureDTO)   { return f.spans[f.spans.length - 1]?.end ?? 0 }
-function featLen(f: FeatureDTO)   { return f.spans.reduce((n, s) => n + s.end - s.start, 0) }
-function featDir(f: FeatureDTO)   { return f.direction === 'forward' ? '→' : f.direction === 'reverse' ? '←' : '—' }
+function featStart(f: FeatureDTO)   { return f.spans[0]?.start ?? 0 }
+function featEnd(f: FeatureDTO)     { return f.spans[f.spans.length - 1]?.end ?? 0 }
+function featLen(f: FeatureDTO)     { return f.spans.reduce((n, s) => n + s.end - s.start, 0) }
+function featDir(f: FeatureDTO)     { return f.direction === 'forward' ? '→' : f.direction === 'reverse' ? '←' : '—' }
+function featProduct(f: FeatureDTO) { return f.qualifiers.product?.[0] ?? '' }
 
 function sortFeatures(features: FeatureDTO[], key: SortKey, asc: boolean): FeatureDTO[] {
   return [...features].sort((a, b) => {
     let av: string | number
     let bv: string | number
     switch (key) {
-      case 'label':     av = a.label;       bv = b.label;       break
-      case 'type':      av = a.type;        bv = b.type;        break
-      case 'start':     av = featStart(a);  bv = featStart(b);  break
-      case 'end':       av = featEnd(a);    bv = featEnd(b);    break
-      case 'length':    av = featLen(a);    bv = featLen(b);    break
-      case 'direction': av = a.direction;   bv = b.direction;   break
+      case 'label':     av = a.label;         bv = b.label;         break
+      case 'product':   av = featProduct(a);  bv = featProduct(b);  break
+      case 'type':      av = a.type;          bv = b.type;          break
+      case 'start':     av = featStart(a);    bv = featStart(b);    break
+      case 'end':       av = featEnd(a);      bv = featEnd(b);      break
+      case 'length':    av = featLen(a);      bv = featLen(b);      break
+      case 'direction': av = a.direction;     bv = b.direction;     break
     }
     const cmp = av! < bv! ? -1 : av! > bv! ? 1 : 0
     return asc ? cmp : -cmp
@@ -56,9 +59,15 @@ export function FeatureTable({ doc }: FeatureTableProps) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return sorted
-    return sorted.filter(f =>
-      f.label.toLowerCase().includes(q) || f.type.toLowerCase().includes(q)
-    )
+    return sorted.filter(f => {
+      if (f.label.toLowerCase().includes(q)) return true
+      if (f.type.toLowerCase().includes(q)) return true
+      const qs = f.qualifiers
+      for (const key of ['product', 'gene', 'note'] as const) {
+        if (qs[key]?.[0]?.toLowerCase().includes(q)) return true
+      }
+      return false
+    })
   }, [sorted, query])
 
   // Scroll the selected row into view when selection changes.
@@ -84,7 +93,7 @@ export function FeatureTable({ doc }: FeatureTableProps) {
       <div style={searchBarStyle}>
         <input
           type="search"
-          placeholder="Search name or type…"
+          placeholder="Search name, product, type…"
           value={query}
           onChange={e => setQuery(e.target.value)}
           style={searchInputStyle}
@@ -142,6 +151,7 @@ export function FeatureTable({ doc }: FeatureTableProps) {
                   }} />
                 </td>
                 <td style={tdStyle}>{feat.label}</td>
+                <td style={productCellStyle} title={featProduct(feat)}>{featProduct(feat)}</td>
                 <td style={{ ...tdStyle, color: 'var(--text-2)' }}>{feat.type}</td>
                 <td style={tdStyle}>{featStart(feat) + 1}</td>
                 <td style={tdStyle}>{featEnd(feat)}</td>
@@ -168,6 +178,11 @@ const thStyle: React.CSSProperties = {
 }
 const tdStyle: React.CSSProperties = {
   padding: '3px 8px', borderBottom: '1px solid var(--border-row)',
+}
+const productCellStyle: React.CSSProperties = {
+  padding: '3px 8px', borderBottom: '1px solid var(--border-row)',
+  maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  color: 'var(--text-2)',
 }
 const searchBarStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 8,
