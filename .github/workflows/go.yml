@@ -1,0 +1,59 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Matches your README requirement
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # 1. Build the Go Backend
+      - name: Build Go Backend
+        run: |
+          go build -o frontend/bin/micromium-backend.exe ./cmd/micromium
+        env:
+          GOOS: windows
+          GOARCH: amd64
+
+      # 2. Build the Frontend and Package with Electron
+      - name: Install Dependencies and Build
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+          # This assumes your package.json has an 'electron-builder' script
+          npx electron-builder --windows nsis --x64
+        env:
+          # If you have code signing certificates, add them to GitHub Secrets
+          # CSC_LINK: ${{ secrets.CSC_LINK }}
+          # CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          NODE_ENV: production
+
+      # 3. Upload the resulting Artifact
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: micromium-windows-installer
+          path: frontend/dist-electron/*.exe
