@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -27,6 +28,7 @@ func main() {
 	port := ln.Addr().(*net.TCPAddr).Port
 	s.SetPort(port)
 	log.Printf("Listening on http://127.0.0.1:%d", port)
+	fmt.Printf("PORT=%d\n", port)
 
 	if err := http.Serve(ln, s.Handler()); err != nil {
 		log.Fatal(err)
