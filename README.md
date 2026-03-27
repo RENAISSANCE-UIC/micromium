@@ -58,6 +58,20 @@ cd micromium
 
 > **Windows SmartScreen warning:** The installer is not yet code-signed, so Windows will show a blue "Windows protected your PC" dialog. Click **More info → Run anyway** to proceed. This is expected for now.
 
+> **IMPORTANT:** We need you to test this out and get back to us. We are going to be filing an application for SignPath and this helps us make the case for the Reputation criterion. 
+Verabatim, these are: 
+"Describe how we can verify that your project is used and trusted. 
+Provide sources and links including 
+* Media reports 
+* Blog articles 
+* Wikipedia articles in other languages (see below for English), Softpedia etc. 
+* Usage data such as number of downloads, forks or dependencies 
+* Analysis such as GitHub Insights 
+* Proof of Trademark ownership if you're using a trademarked name 
+If available, we will also look at the English Wikipedia article and OpenHub (see below), and community data such as GitHub Insights."
+
+ 
+ 
 > Artifacts expire after 90 days. If none is available, open an issue and we'll post a fresh build.
 
 ---
