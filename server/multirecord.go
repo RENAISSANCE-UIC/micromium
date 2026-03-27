@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/weackerm/micromium/app"
-	"github.com/weackerm/micromium/bio"
+	"github.com/RENAISSANCE-UIC/micromium/app"
+	"github.com/RENAISSANCE-UIC/micromium/bio"
 )
 
 // parseAllGenBankRecords splits a (potentially multi-record) GenBank file on

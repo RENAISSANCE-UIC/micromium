@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"image/color"
 
-	"github.com/weackerm/micromium/app"
-	"github.com/weackerm/micromium/bio"
+	"github.com/RENAISSANCE-UIC/micromium/app"
+	"github.com/RENAISSANCE-UIC/micromium/bio"
 )
 
 // GenomeThreshold is the sequence length above which a document is treated as

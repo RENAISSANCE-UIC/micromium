@@ -1,4 +1,4 @@
-module github.com/weackerm/micromium
+module github.com/RENAISSANCE-UIC/micromium
 
 go 1.22
 

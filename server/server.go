@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/weackerm/micromium/app"
-	"github.com/weackerm/micromium/bio"
+	"github.com/RENAISSANCE-UIC/micromium/app"
+	"github.com/RENAISSANCE-UIC/micromium/bio"
 )
 
 // Server holds document state and serves the HTTP + WebSocket API.

@@ -1,7 +1,7 @@
 // Package app manages application state. No UI imports.
 package app
 
-import "github.com/weackerm/micromium/bio"
+import "github.com/RENAISSANCE-UIC/micromium/bio"
 
 // Document is the single source of truth for an open file.
 // Both the sequence viewer and circle map are read-only projections of this.

@@ -5,8 +5,8 @@ import (
 	"net"
 	"net/http"
 
-	frontend "github.com/weackerm/micromium/frontend"
-	"github.com/weackerm/micromium/server"
+	frontend "github.com/RENAISSANCE-UIC/micromium/frontend"
+	"github.com/RENAISSANCE-UIC/micromium/server"
 )
 
 func main() {
