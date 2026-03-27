@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 echo "==> Installing frontend deps..."
 cd frontend
-npm install --silent
+npm install 
 
 echo "==> Building renderer + Electron main..."
 npm run build
