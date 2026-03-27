@@ -58,8 +58,8 @@ cd micromium
 
 > **Windows SmartScreen warning:** The installer is not yet code-signed, so Windows will show a blue "Windows protected your PC" dialog. Click **More info → Run anyway** to proceed. This is expected for now.
 
-> **IMPORTANT:** We need you to test this out and get back to us. We are going to be filing an application for SignPath and this helps us make the case for the Reputation criterion. 
-Verabatim, these are: 
+> **IMPORTANT:** We need you to test this out and get back to us. We are going to be filing an application for [SignPath](https://signpath.org/) and this helps us make the case for the Reputation criterion. Verabatim, these are:
+ 
 "Describe how we can verify that your project is used and trusted. 
 Provide sources and links including 
 * Media reports 
