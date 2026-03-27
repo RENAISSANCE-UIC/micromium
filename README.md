@@ -8,7 +8,7 @@ Built in Go with an Electron frontend.
 
 
 
-> **Alpha software.** Core viewing works. Editing, saving, and packaging are not yet complete.
+> **Early release.** Core viewing works. Editing and saving are not yet implemented — feedback and bug reports are very welcome.
 
 ---
 
@@ -51,13 +51,14 @@ cd micromium
 
 ### Windows
 
-```powershell
-git clone git@github.com:RENAISSANCE-UIC/micromium.git
-cd micromium
-.\build\build-windows.ps1
-```
+1. Go to the **Actions** tab of this repository on GitHub
+2. Click the most recent passing workflow run
+3. Scroll to the bottom and download the **`micromium-windows-installer`** artifact
+4. Unzip and run the `.exe` — Windows will install Micromium and create a Start Menu shortcut
 
-Produces an NSIS installer in `frontend\dist-electron\`. Requires Go and Node.js 20+ on your PATH.
+> **Windows SmartScreen warning:** The installer is not yet code-signed, so Windows will show a blue "Windows protected your PC" dialog. Click **More info → Run anyway** to proceed. This is expected for now.
+
+> Artifacts expire after 90 days. If none is available, open an issue and we'll post a fresh build.
 
 ---
 
@@ -121,7 +122,7 @@ Open any file via **File → Open** in the app.
 ## Known limitations (alpha)
 
 - **Read-only.** No saving, no feature editing, no copy/paste yet.
-- The packaged installer has not been broadly smoke-tested — running from source is recommended.
+- The app is in active development — some rough edges are expected.
 - Sequence panel is blank in genome mode (bases are omitted for large files by design).
 
 ---
