@@ -1,6 +1,6 @@
 # Go build output
-micromium
-micromiumserver
+/micromium
+/micromiumserver
 *.exe
 
 # Electron / Node build output
