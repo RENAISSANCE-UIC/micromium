@@ -24,6 +24,7 @@
       "package.json"
     ],
     "linux": {
+      "icon": "build/Project_Moonshot.png",
       "target": ["AppImage"],
       "category": "Science",
       "executableArgs": ["--no-sandbox"],
@@ -32,6 +33,7 @@
       ]
     },
     "win": {
+      "icon": "build/Project_Moonshot.ico",
       "target": [{ "target": "nsis", "arch": ["x64"] }],
       "extraResources": [
         { "from": "../micromiumserver.exe", "to": "micromiumserver.exe" }
