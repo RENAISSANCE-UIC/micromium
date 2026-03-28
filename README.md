@@ -166,4 +166,4 @@ build/          dev.sh (Linux), build.sh, build-windows.ps1
 
 ## Feedback
 
-File issues or ping the author directly. This is pre-release — rough edges are expected.
+File issues or ping the author directly. This is pre-release.
