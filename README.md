@@ -144,7 +144,7 @@ Open any file via **File → Open** in the app.
 
 ## Known limitations (alpha)
 
-- **Read-only.** No saving, no feature editing, no copy/paste yet.
+- **Read-only.** No saving, no feature editing... we did get some copy/paste to work finally. BUT WE DO HAVE DARK MODE FOR SOME REASON BECAUSE... DARK MODE!!!
 - The app is in active development — some rough edges are expected.
 - Sequence panel is blank in genome mode (bases are omitted for large files by design).
 
