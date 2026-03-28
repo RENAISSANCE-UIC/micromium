@@ -4,9 +4,19 @@ A cross-platform plasmid and genome viewer for GenBank files, inspired by
 [ApE (A Plasmid Editor)](https://jorgensen.biology.utah.edu/wayned/ape/).
 Built in Go with an Electron frontend.
 
+A companion for the R library `micRomicon`.
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19225286.svg)](https://doi.org/10.5281/zenodo.19225286)
 
+## Project Moonshot Disclaimer
 
+As researchers steeped in R for over a decade, we had grown accustomed to an unusually forgiving world. In that world, scriptable analysis ran locally, state was gloriously ephemeral, compiled code was murky plumbing that only vaguely remembered from the 1990s, and success was defined by personal reproducibility rather than generality. Building a standalone, cross‑platform application with the specs we became convinced were required once we had other researchers in mind (a compiled backend, a persistent UI, and expectations of durability) exposed how much that environment had quietly shielded us.
+
+`Micromium` began just as a speculative exercise a project lead got while listening to the [*Hacked*](https://www.patreon.com/hackedpodcast) podcast on the way to the lab: could modern coding agents make it tractable for domain scientists to build a real tool, not just an analysis artifact? With a concrete wishlist, a rough design, and a bias toward usability for biologists and engineers early in the trajectory (just as we were Linux was just a thing you used to get the HPC clusters to run your batch scripts), we mapped the problem space and started building.
+
+The big lessons were less algorithmic than infrastructural: cross‑platform build systems, language interop, platform‑specific quirks, and the sobering realization that *"works on my machine"* is not a milestone we could actually share with colleagues. Windows, in particular, was an efficient teacher. Even arriving at the resolution of delegating compilation to GitHub Actions and iterating through the surf of failed builds proved to be an inelegant introduction to creating software as a durable artifact rather than a personal workflow.
+
+What resulted is an early but functional viewer that we hope will be as useful for you as it has been for us so far. `Micromium` is still in active development and we have a retinue of features we still want to build in as we try to engage meaningfully with the wondrous enigma that is nature. 
 
 > **Early release.** Core viewing works. Editing and saving are not yet implemented — feedback and bug reports are very welcome.
 
