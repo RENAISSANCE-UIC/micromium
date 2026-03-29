@@ -10,7 +10,7 @@ A companion for the R library `micRomicon`.
 
 ## Project Moonshot Disclaimer
 
-As researchers steeped in R for over a decade, we had grown accustomed to an unusually forgiving world. A serene amd pleasant world where scriptable analysis ran locally, state was gloriously ephemeral, compiled code was some murky plumbing vaguely remembered from the 1990s, and success was defined by personal reproducibility rather than generality. Building a standalone, cross‑platform application with specs we somehow convinced ourselves were REQUIRED once other researchers entered the picture (a compiled backend, a persistent UI, and expectations of durability) exposed just how much that environment had quietly shielded us.
+<img src="Project_Moonshot.png" alt="Project Moonshot schematic" width="120"/>As researchers steeped in R for over a decade, we had grown accustomed to an unusually forgiving world. A serene amd pleasant world where scriptable analysis ran locally, state was gloriously ephemeral, compiled code was some murky plumbing vaguely remembered from the 1990s, and success was defined by personal reproducibility rather than generality. Building a standalone, cross‑platform application with specs we somehow convinced ourselves were REQUIRED once other researchers entered the picture (a compiled backend, a persistent UI, and expectations of durability) exposed just how much that environment had quietly shielded us.
 
 ![](Project_Moonshot.png)
 
