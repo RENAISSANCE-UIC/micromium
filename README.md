@@ -10,7 +10,11 @@ A companion for the R library `micRomicon`.
 
 ## Project Moonshot Disclaimer
 
-<img src="Project_Moonshot.png" alt="Project Moonshot schematic" width="120"/>As researchers steeped in R for over a decade, we had grown accustomed to an unusually forgiving world. A serene amd pleasant world where scriptable analysis ran locally, state was gloriously ephemeral, compiled code was some murky plumbing vaguely remembered from the 1990s, and success was defined by personal reproducibility rather than generality. Building a standalone, cross‑platform application with specs we somehow convinced ourselves were REQUIRED once other researchers entered the picture (a compiled backend, a persistent UI, and expectations of durability) exposed just how much that environment had quietly shielded us.
+
+<img src="Project_Moonshot.png"
+     alt="Project Moonshot schematic"
+     width="120"
+     style="vertical-align: middle; margin: 0 0.5em;">As researchers steeped in R for over a decade, we had grown accustomed to an unusually forgiving world. A serene amd pleasant world where scriptable analysis ran locally, state was gloriously ephemeral, compiled code was some murky plumbing vaguely remembered from the 1990s, and success was defined by personal reproducibility rather than generality. Building a standalone, cross‑platform application with specs we somehow convinced ourselves were REQUIRED once other researchers entered the picture (a compiled backend, a persistent UI, and expectations of durability) exposed just how much that environment had quietly shielded us.
 
 `Micromium` began just as a speculative exercise a project lead got while listening to the [*Hacked*](https://www.patreon.com/hackedpodcast) podcast on the way to the lab: could modern coding agents make it tractable for domain scientists to build a real tool, not just an analysis artifact? With a concrete wishlist, a rough design, and a bias toward usability for biologists and engineers early in the research trajectory (just as we were when Linux was merely a thing they made you use to get HPC clusters to run batch scripts), we mapped the problem space and started building.
 
