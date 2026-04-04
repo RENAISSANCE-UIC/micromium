@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, nativeTheme, shell } from 'electron'
 import { spawn, ChildProcess } from 'child_process'
 import * as path from 'path'
 import * as readline from 'readline'
@@ -99,6 +99,8 @@ ipcMain.handle('file:watch', (_event, filePath: string) => {
     }, 1500)
   })
 })
+
+ipcMain.handle('shell:openExternal', (_event, url: string) => shell.openExternal(url))
 
 ipcMain.handle('dialog:openFile', async () => {
   if (!mainWindow) return null

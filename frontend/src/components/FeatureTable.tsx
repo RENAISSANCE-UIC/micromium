@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useSelection } from '../hooks/useSelection'
 import { genomeFeatureLightColor } from '../lib/cgviewJson'
+import { featureExternalLinks, openExternalLink } from '../externalLinks'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
 type SortKey = 'label' | 'type' | 'start' | 'end' | 'length' | 'direction' | 'product'
@@ -14,6 +15,7 @@ const COLUMNS: Array<{ key: SortKey | ''; label: string; width: number }> = [
   { key: 'end',       label: 'End',     width: 72  },
   { key: 'length',    label: 'Len',     width: 64  },
   { key: 'direction', label: 'Dir',     width: 36  },
+  { key: '',          label: 'Links',   width: 120 },
 ]
 
 function featStart(f: FeatureDTO)   { return f.spans[0]?.start ?? 0 }
@@ -157,6 +159,9 @@ export function FeatureTable({ doc }: FeatureTableProps) {
                 <td style={tdStyle}>{featEnd(feat)}</td>
                 <td style={tdStyle}>{featLen(feat)}</td>
                 <td style={{ ...tdStyle, color: 'var(--text-2)' }}>{featDir(feat)}</td>
+                <td style={{ ...tdStyle }} onClick={e => e.stopPropagation()}>
+                  <LinkBadges qualifiers={feat.qualifiers} />
+                </td>
               </tr>
             )
           })}
@@ -193,4 +198,30 @@ const searchInputStyle: React.CSSProperties = {
   flex: 1, fontSize: 12, padding: '3px 6px',
   border: '1px solid var(--btn-bd)', borderRadius: 3, outline: 'none',
   background: 'var(--btn-bg)', color: 'var(--text)',
+}
+
+function LinkBadges({ qualifiers }: { qualifiers: FeatureDTO['qualifiers'] }) {
+  const links = featureExternalLinks(qualifiers)
+  if (links.length === 0) return null
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+      {links.map(link => (
+        <button
+          key={link.url}
+          title={link.url}
+          onClick={() => openExternalLink(link.url)}
+          style={linkBadgeStyle}
+        >
+          {link.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+const linkBadgeStyle: React.CSSProperties = {
+  fontSize: 10, padding: '1px 5px', borderRadius: 3, cursor: 'pointer',
+  border: '1px solid var(--btn-bd)', background: 'var(--btn-bg)',
+  color: 'var(--text-2)', whiteSpace: 'nowrap', lineHeight: '16px',
+  textDecoration: 'none',
 }

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react'
 import { useSelection } from '../hooks/useSelection'
+import { featureExternalLinks, openExternalLink } from '../externalLinks'
 import type { DocumentDTO, FeatureDTO } from '../types'
 
 function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
@@ -57,6 +58,7 @@ export function CircMap({ doc, dark = false }: CircMapProps) {
   const { width: cw, height: ch } = useContainerSize(containerRef)
   const canvasSize = Math.max(100, Math.min(cw, ch))
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // D3: separate coverage arrays for forward and reverse strands
   const { fwdCov, revCov } = useMemo(() => {
@@ -277,7 +279,15 @@ export function CircMap({ doc, dark = false }: CircMapProps) {
     }
   }, [doc, fwdCov, revCov])
 
-  const handleMouseLeave = useCallback(() => setTooltip(null), [])
+  const handleMouseLeave = useCallback(() => {
+    hideTimerRef.current = setTimeout(() => setTooltip(null), 200)
+  }, [])
+
+  const handleTooltipEnter = useCallback(() => {
+    if (hideTimerRef.current) { clearTimeout(hideTimerRef.current); hideTimerRef.current = null }
+  }, [])
+
+  const handleTooltipLeave = useCallback(() => { setTooltip(null) }, [])
 
   // D3: click checks both rings
   const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -331,28 +341,55 @@ export function CircMap({ doc, dark = false }: CircMapProps) {
         />
       )}
       {tooltip && (
-        <div style={{
-          position: 'absolute',
-          left: tooltip.x + 14,
-          top:  tooltip.y - 10,
-          background: 'var(--bg-hud)',
-          border: '1px solid var(--border)',
-          borderRadius: 4,
-          padding: '4px 8px',
-          fontSize: 12,
-          fontFamily: 'system-ui, sans-serif',
-          pointerEvents: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-          color: 'var(--text)',
-          whiteSpace: 'nowrap',
-          zIndex: 10,
-        }}>
+        <div
+          onMouseEnter={handleTooltipEnter}
+          onMouseLeave={handleTooltipLeave}
+          style={{
+            position: 'absolute',
+            left: tooltip.x + 14,
+            top:  tooltip.y - 10,
+            background: 'var(--bg-hud)',
+            border: '1px solid var(--border)',
+            borderRadius: 4,
+            padding: '4px 8px',
+            fontSize: 12,
+            fontFamily: 'system-ui, sans-serif',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+            color: 'var(--text)',
+            whiteSpace: 'nowrap',
+            zIndex: 10,
+          }}
+        >
           <div style={{ fontWeight: 600 }}>{tooltip.feat.label}</div>
           <div style={{ color: 'var(--text-2)', fontSize: 11 }}>
             {tooltip.feat.type} · {tooltip.feat.spans[0].start + 1}–{tooltip.feat.spans[tooltip.feat.spans.length - 1].end}
           </div>
+          <TooltipLinks qualifiers={tooltip.feat.qualifiers} />
         </div>
       )}
+    </div>
+  )
+}
+
+function TooltipLinks({ qualifiers }: { qualifiers: FeatureDTO['qualifiers'] }) {
+  const links = featureExternalLinks(qualifiers)
+  if (links.length === 0) return null
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 4 }}>
+      {links.map(link => (
+        <button
+          key={link.url}
+          title={link.url}
+          onClick={() => openExternalLink(link.url)}
+          style={{
+            fontSize: 10, padding: '1px 5px', borderRadius: 3, cursor: 'pointer',
+            border: '1px solid var(--btn-bd)', background: 'var(--btn-bg)',
+            color: 'var(--text-2)', whiteSpace: 'nowrap', lineHeight: '16px',
+          }}
+        >
+          {link.label}
+        </button>
+      ))}
     </div>
   )
 }

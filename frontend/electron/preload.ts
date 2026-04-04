@@ -11,4 +11,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onFileChanged: (cb: (filePath: string) => void) => {
     ipcRenderer.on('file:changed', (_event, filePath: string) => cb(filePath))
   },
+  openExternal: (url: string): Promise<void> => ipcRenderer.invoke('shell:openExternal', url),
 })

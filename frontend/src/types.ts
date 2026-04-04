@@ -49,6 +49,7 @@ declare global {
       onThemeChange: (cb: (dark: boolean) => void) => void
       watchFile: (filePath: string) => Promise<void>
       onFileChanged: (cb: (filePath: string) => void) => void
+      openExternal: (url: string) => Promise<void>
     }
   }
 }
