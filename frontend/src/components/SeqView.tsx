@@ -19,7 +19,21 @@ function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
   return size
 }
 
-const BASES_PER_LINE = 100
+function useBasesPerLine(containerWidth: number): number {
+  return useMemo(() => {
+    if (containerWidth <= 0) return DEFAULT_BASES_PER_LINE
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return DEFAULT_BASES_PER_LINE
+    ctx.font = '12px monospace'
+    const cw = ctx.measureText('0').width
+    // Overhead: gutter (6ch) + end-position label (~6ch) + margins (14px)
+    const overhead = 12 * cw + 14
+    return Math.max(20, Math.floor((containerWidth - overhead) / cw))
+  }, [containerWidth])
+}
+
+const DEFAULT_BASES_PER_LINE = 100
 const SEQ_HEIGHT    = 20   // px — sequence text row
 const RULER_HEIGHT  = 16   // px — position ruler
 const TRACK_HEIGHT  = 15   // px — each annotation layer
@@ -78,8 +92,8 @@ function assignLayers(items: TrackItem[]): number {
   return layerEndAt.length
 }
 
-function buildLineLayouts(basesLength: number, features: FeatureDTO[]): LineLayout[] {
-  const lineCount = Math.ceil(basesLength / BASES_PER_LINE)
+function buildLineLayouts(basesLength: number, features: FeatureDTO[], basesPerLine: number): LineLayout[] {
+  const lineCount = Math.ceil(basesLength / basesPerLine)
   const layouts: LineLayout[] = Array.from({ length: lineCount }, () => ({
     fwdTracks: [], revTracks: [], fwdLayerCount: 0, revLayerCount: 0,
   }))
@@ -90,14 +104,14 @@ function buildLineLayouts(basesLength: number, features: FeatureDTO[]): LineLayo
 
     feat.spans.forEach(span => {
       if (span.end <= span.start) return
-      const firstLine = Math.floor(span.start / BASES_PER_LINE)
-      const lastLine  = Math.floor(Math.max(span.end - 1, span.start) / BASES_PER_LINE)
+      const firstLine = Math.floor(span.start / basesPerLine)
+      const lastLine  = Math.floor(Math.max(span.end - 1, span.start) / basesPerLine)
 
       for (let li = firstLine; li <= lastLine && li < lineCount; li++) {
-        const lineStart = li * BASES_PER_LINE
-        const lineEnd   = lineStart + BASES_PER_LINE
+        const lineStart = li * basesPerLine
+        const lineEnd   = lineStart + basesPerLine
         const startCol  = Math.max(0, span.start - lineStart)
-        const endCol    = Math.min(BASES_PER_LINE, span.end - lineStart)
+        const endCol    = Math.min(basesPerLine, span.end - lineStart)
         if (endCol <= startCol) continue
 
         const item: TrackItem = {
@@ -240,12 +254,13 @@ interface RowData {
   selection:         SelectionDTO | null
   lineLayouts:       LineLayout[]
   onAnnotationClick: (feat: FeatureDTO) => void
+  basesPerLine:      number
 }
 
 function Row({ index, style, data }: ListChildComponentProps<RowData>) {
-  const { doc, selection, lineLayouts, onAnnotationClick } = data
-  const lineStart = index * BASES_PER_LINE
-  const lineEnd   = Math.min(lineStart + BASES_PER_LINE, doc.bases.length)
+  const { doc, selection, lineLayouts, onAnnotationClick, basesPerLine } = data
+  const lineStart = index * basesPerLine
+  const lineEnd   = Math.min(lineStart + basesPerLine, doc.bases.length)
   const layout    = lineLayouts[index]
 
   const fwdSegments: Array<{ text: string; fg: string; bg: string }> = []
@@ -379,20 +394,23 @@ function downloadFasta(filename: string, text: string) {
   URL.revokeObjectURL(url)
 }
 
-function SelectionHUD({ selection, bases, features }: {
+function SelectionHUD({ selection, bases, features, onTopologyChange, topologyActive }: {
   selection: import('../types').SelectionDTO | null
   bases:     string
   features:  import('../types').FeatureDTO[]
+  onTopologyChange?: (t: { protein: string; label?: string; qualifiers?: Record<string, string[]> } | null) => void
+  topologyActive?: boolean
 }) {
-  const [senseMode,        setSenseMode]        = useState(true)
-  const [copied,           setCopied]           = useState(false)
-  const [showTranslation,  setShowTranslation]  = useState(false)
-  const [copiedProtein,    setCopiedProtein]    = useState(false)
+  const [senseMode,           setSenseMode]           = useState(true)
+  const [copied,              setCopied]              = useState(false)
+  const [showTranslation,     setShowTranslation]     = useState(false)
+  const [copiedProtein,       setCopiedProtein]       = useState(false)
 
   // Reset when selection changes
   useEffect(() => {
-    setSenseMode(true); setCopied(false); setShowTranslation(false); setCopiedProtein(false)
-  }, [selection?.featureId])
+    setSenseMode(true); setCopied(false); setShowTranslation(false)
+    setCopiedProtein(false); onTopologyChange?.(null)
+  }, [selection?.featureId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasSelection = !!(selection && selection.start >= 0 && selection.end > selection.start)
   const feat      = hasSelection && selection!.featureId
@@ -500,14 +518,27 @@ function SelectionHUD({ selection, bases, features }: {
             )}
           </span>
           <span style={{
-            flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
+            flex: 1, minWidth: 0, overflow: 'auto', whiteSpace: 'nowrap',
             color: 'var(--text)', letterSpacing: 0.5,
           }}>
             {translationResult.protein}
           </span>
-          <button onClick={handleCopyProtein} style={{ ...hudBtnStyle, flexShrink: 0, marginRight: 6 }}>
+          <button onClick={handleCopyProtein} style={{ ...hudBtnStyle, flexShrink: 0 }}>
             {copiedProtein ? 'Copied ✓' : 'Copy AA'}
           </button>
+          {onTopologyChange && (
+            <button
+              onClick={() => onTopologyChange(
+                topologyActive
+                  ? null
+                  : { protein: translationResult.protein, label: feat?.label, qualifiers: feat?.qualifiers }
+              )}
+              title="Transmembrane topology viewer (D3 force diagram + Protter SVG)"
+              style={{ ...hudBtnStyle, flexShrink: 0, marginRight: 6, color: topologyActive ? '#6a3d9a' : 'var(--btn-txt)', borderColor: topologyActive ? '#6a3d9a' : 'var(--btn-bd)' }}
+            >
+              Topology
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -546,13 +577,16 @@ const proteinPanelStyle: React.CSSProperties = {
 
 interface SeqViewProps {
   doc: DocumentDTO
+  onTopologyChange?: (t: { protein: string; label?: string; qualifiers?: Record<string, string[]> } | null) => void
+  topologyActive?: boolean
 }
 
-export function SeqView({ doc }: SeqViewProps) {
+export function SeqView({ doc, onTopologyChange, topologyActive }: SeqViewProps) {
   const { selection, publish } = useSelection('seqview')
   const listRef      = useRef<VariableSizeList>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { width, height } = useContainerSize(containerRef)
+  const basesPerLine = useBasesPerLine(width)
 
   const [hiddenTypes, setHiddenTypes] = useState<Set<string>>(new Set())
 
@@ -571,8 +605,8 @@ export function SeqView({ doc }: SeqViewProps) {
   )
 
   const lineLayouts = useMemo(
-    () => buildLineLayouts(doc.bases.length, visibleFeatures),
-    [doc.bases.length, visibleFeatures],
+    () => buildLineLayouts(doc.bases.length, visibleFeatures, basesPerLine),
+    [doc.bases.length, visibleFeatures, basesPerLine],
   )
 
   const lineLayoutsRef = useRef(lineLayouts)
@@ -584,13 +618,13 @@ export function SeqView({ doc }: SeqViewProps) {
 
   useEffect(() => {
     if (selection && selection.start >= 0) {
-      const lineNum = Math.floor(selection.start / BASES_PER_LINE)
+      const lineNum = Math.floor(selection.start / basesPerLine)
       const pixelOffset = getLineOffset(lineLayoutsRef.current, lineNum)
       listRef.current?.scrollTo(Math.max(0, pixelOffset - 20))
     }
-  }, [selection])
+  }, [selection, basesPerLine])
 
-  const lineCount = Math.ceil(doc.bases.length / BASES_PER_LINE)
+  const lineCount = Math.ceil(doc.bases.length / basesPerLine)
 
   const onAnnotationClick = useCallback((feat: FeatureDTO) => {
     const start = feat.spans[0]?.start ?? 0
@@ -599,15 +633,15 @@ export function SeqView({ doc }: SeqViewProps) {
   }, [publish])
 
   const itemData = useMemo<RowData>(
-    () => ({ doc, selection, lineLayouts, onAnnotationClick }),
-    [doc, selection, lineLayouts, onAnnotationClick],
+    () => ({ doc, selection, lineLayouts, onAnnotationClick, basesPerLine }),
+    [doc, selection, lineLayouts, onAnnotationClick, basesPerLine],
   )
 
   const scrollToBp = useCallback((bp: number) => {
-    const lineNum = Math.floor((bp - 1) / BASES_PER_LINE)
+    const lineNum = Math.floor((bp - 1) / basesPerLine)
     const pixelOffset = getLineOffset(lineLayoutsRef.current, lineNum)
     listRef.current?.scrollTo(Math.max(0, pixelOffset - 20))
-  }, [])
+  }, [basesPerLine])
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement
@@ -615,10 +649,10 @@ export function SeqView({ doc }: SeqViewProps) {
     const row = target.closest('[data-line-idx]') as HTMLElement | null
     if (!row) return
     const lineIdx   = parseInt(row.dataset.lineIdx ?? '0', 10)
-    const lineStart = lineIdx * BASES_PER_LINE
-    const lineEnd   = Math.min(lineStart + BASES_PER_LINE, doc.bases.length)
+    const lineStart = lineIdx * basesPerLine
+    const lineEnd   = Math.min(lineStart + basesPerLine, doc.bases.length)
     publish({ start: lineStart, end: lineEnd, featureId: '' })
-  }, [doc.bases.length, publish])
+  }, [doc.bases.length, publish, basesPerLine])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
@@ -643,7 +677,7 @@ export function SeqView({ doc }: SeqViewProps) {
           </VariableSizeList>
         )}
       </div>
-      <SelectionHUD selection={selection} bases={doc.bases} features={doc.features} />
+      <SelectionHUD selection={selection} bases={doc.bases} features={doc.features} onTopologyChange={onTopologyChange} topologyActive={topologyActive} />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { CircMap } from './components/CircMap'
 import { GenomeMap } from './components/GenomeMap'
 import { GenomeSeqPanel } from './components/GenomeSeqPanel'
 import { SeqView } from './components/SeqView'
+import { TopologyViewer } from './components/TopologyViewer'
 import { FeatureTable } from './components/FeatureTable'
 import { RecordSelector } from './components/RecordSelector'
 import type { DocumentDTO } from './types'
@@ -36,6 +37,9 @@ export default function App() {
     document.documentElement.classList.toggle('dark', next)
     localStorage.setItem('micromium-dark', String(next))
   }
+  const [topoTarget, setTopoTarget] = useState<{
+    protein: string; label?: string; qualifiers?: Record<string, string[]>
+  } | null>(null)
   const [circmapWidth, setCircmapWidth] = useState(CIRCMAP_DEFAULT)
   const [seqPanelWidth, setSeqPanelWidth] = useState(SEQPANEL_DEFAULT)
   const [tableHeight, setTableHeight] = useState(TABLE_DEFAULT)
@@ -75,6 +79,8 @@ export default function App() {
       setFileChangedPath(changedPath)
     })
   }, [])
+
+  useEffect(() => { setTopoTarget(null) }, [doc])
 
   const startCircmapDrag = useCallback((e: React.MouseEvent) => {
     hDragging.current = 'circmap'
@@ -200,11 +206,15 @@ export default function App() {
             <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
               <div style={{ flex: '1 1 auto', display: 'flex', minHeight: 0, overflow: 'hidden' }}>
                 <div style={{ width: seqPanelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: '1px solid #d0d0d0' }}>
-                  <GenomeSeqPanel doc={doc} alwaysShow genomeMode />
+                  <GenomeSeqPanel doc={doc} alwaysShow genomeMode onTopologyChange={setTopoTarget} topologyActive={!!topoTarget} />
                 </div>
                 <div onMouseDown={startSeqPanelDrag} style={{ width: 4, flexShrink: 0, cursor: 'col-resize', background: 'var(--border)' }} />
                 <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}>
-                  <GenomeMap doc={doc} />
+                  {topoTarget ? (
+                    <TopologyViewer protein={topoTarget.protein} label={topoTarget.label} qualifiers={topoTarget.qualifiers} />
+                  ) : (
+                    <GenomeMap doc={doc} />
+                  )}
                 </div>
               </div>
               <div onMouseDown={startVDrag} style={rowResizeHandle} />
@@ -217,7 +227,7 @@ export default function App() {
             <>
               <div style={{ flex: '1 1 auto', display: 'flex', minHeight: 0, overflow: 'hidden' }}>
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                  <SeqView doc={doc} />
+                  <SeqView doc={doc} onTopologyChange={setTopoTarget} topologyActive={!!topoTarget} />
                 </div>
                 <div
                   onMouseDown={startCircmapDrag}
@@ -225,9 +235,13 @@ export default function App() {
                 />
                 <div style={{
                   width: circmapWidth, flexShrink: 0, overflow: 'hidden',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  display: 'flex', flexDirection: 'column',
                 }}>
-                  <CircMap doc={doc} dark={dark} />
+                  {topoTarget ? (
+                    <TopologyViewer protein={topoTarget.protein} label={topoTarget.label} qualifiers={topoTarget.qualifiers} />
+                  ) : (
+                    <CircMap doc={doc} dark={dark} />
+                  )}
                 </div>
               </div>
               <div onMouseDown={startVDrag} style={rowResizeHandle} />

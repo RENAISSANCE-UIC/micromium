@@ -25,18 +25,35 @@
     ],
     "linux": {
       "icon": "build/Project_Moonshot.png",
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Science",
-      "executableArgs": ["--no-sandbox"],
+      "executableArgs": [
+        "--no-sandbox"
+      ],
       "extraResources": [
-        { "from": "../micromiumserver", "to": "micromiumserver" }
+        {
+          "from": "../micromiumserver",
+          "to": "micromiumserver"
+        }
       ]
     },
     "win": {
       "icon": "build/Project_Moonshot.ico",
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "extraResources": [
-        { "from": "../micromiumserver.exe", "to": "micromiumserver.exe" }
+        {
+          "from": "../micromiumserver.exe",
+          "to": "micromiumserver.exe"
+        }
       ]
     }
   },
@@ -50,7 +67,9 @@
     "vite": "^6.0.0"
   },
   "dependencies": {
+    "@types/d3": "^7.4.3",
     "@types/react-window": "^1.8.8",
+    "d3": "^7.9.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-window": "^1.8.10"

@@ -240,9 +240,15 @@ function ArrowTrack({ tracks, isFwd, selId, onFeatClick, genomeMode }: {
 
 // ---- Main component ------------------------------------------------------
 
-interface Props { doc: DocumentDTO; alwaysShow?: boolean; genomeMode?: boolean }
+interface Props {
+  doc: DocumentDTO
+  alwaysShow?: boolean
+  genomeMode?: boolean
+  onTopologyChange?: (t: { protein: string; label?: string; qualifiers?: Record<string, string[]> } | null) => void
+  topologyActive?: boolean
+}
 
-export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
+export function GenomeSeqPanel({ doc, alwaysShow, genomeMode, onTopologyChange, topologyActive }: Props) {
   const { selection, publish } = useSelection('seqpanel')
 
   const [hiddenTypes, setHiddenTypes] = useState<Set<string>>(new Set())
@@ -267,8 +273,8 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
   const [loading, setLoading]   = useState(false)
   const [senseMode,       setSenseMode]       = useState(true)
   const [copied,          setCopied]          = useState(false)
-  const [showTranslation, setShowTranslation] = useState(false)
-  const [copiedProtein,   setCopiedProtein]   = useState(false)
+  const [showTranslation,    setShowTranslation]    = useState(false)
+  const [copiedProtein,      setCopiedProtein]      = useState(false)
 
   useEffect(() => {
     if (!selection || selection.start < 0 || !selection.featureId) {
@@ -296,8 +302,8 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
 
   // Reset orientation and translation when feature changes
   useEffect(() => {
-    setSenseMode(true); setCopied(false); setShowTranslation(false); setCopiedProtein(false)
-  }, [state?.featId])
+    setSenseMode(true); setCopied(false); setShowTranslation(false); setCopiedProtein(false); onTopologyChange?.(null)
+  }, [state?.featId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const feat      = state ? doc.features.find(f => f.id === state.featId) ?? null : null
   const isReverse = feat?.direction === 'reverse'
@@ -568,7 +574,7 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
             )}
           </span>
           <span style={{
-            flex: 1, overflow: 'auto', whiteSpace: 'nowrap',
+            flex: 1, minWidth: 0, overflow: 'auto', whiteSpace: 'nowrap',
             color: 'var(--text)', letterSpacing: 0.5,
           }}>
             {translationResult.protein}
@@ -576,6 +582,19 @@ export function GenomeSeqPanel({ doc, alwaysShow, genomeMode }: Props) {
           <button onClick={handleCopyProtein} style={{ ...exportBtnStyle, flexShrink: 0 }}>
             {copiedProtein ? 'Copied ✓' : 'Copy AA'}
           </button>
+          {onTopologyChange && (
+            <button
+              onClick={() => onTopologyChange(
+                topologyActive
+                  ? null
+                  : { protein: translationResult.protein, label: feat?.label, qualifiers: feat?.qualifiers }
+              )}
+              title="Transmembrane topology viewer (D3 force diagram + Protter SVG)"
+              style={{ ...exportBtnStyle, flexShrink: 0, marginRight: 6, color: topologyActive ? '#6a3d9a' : 'var(--btn-txt)', borderColor: topologyActive ? '#6a3d9a' : 'var(--btn-bd)' }}
+            >
+              Topology
+            </button>
+          )}
         </div>
       )}
     </div>

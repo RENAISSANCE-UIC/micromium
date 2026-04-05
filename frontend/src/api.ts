@@ -42,6 +42,35 @@ export async function openFile(path: string): Promise<DocumentDTO> {
   return r.json()
 }
 
+export interface TopologySegment {
+  start: number  // 1-indexed, inclusive
+  end: number    // 1-indexed, inclusive
+  type: 'TM' | 'peri' | 'cyto'
+}
+
+export interface TopologyResult {
+  sequence: string
+  segments: TopologySegment[]
+  length: number
+  profile: number[]  // per-residue KD score
+}
+
+export async function fetchTopology(seq: string): Promise<TopologyResult> {
+  const base = await baseUrl()
+  const r = await fetch(`${base}/api/topology?seq=${encodeURIComponent(seq)}`)
+  if (!r.ok) throw new Error(await r.text())
+  return r.json()
+}
+
+export async function fetchProtterSVG(seq: string, name: string): Promise<string> {
+  const base = await baseUrl()
+  const r = await fetch(`${base}/api/protter?seq=${encodeURIComponent(seq)}&name=${encodeURIComponent(name)}`)
+  if (!r.ok) throw new Error(`HTTP ${r.status}`)
+  const text = await r.text()
+  if (!text.includes('<svg')) throw new Error('Protter response is not SVG — service may be down')
+  return text
+}
+
 export async function selectRecord(index: number): Promise<DocumentDTO> {
   const base = await baseUrl()
   const r = await fetch(`${base}/api/document/select`, {

@@ -36,6 +36,8 @@ func New() *Server {
 	s.mux.HandleFunc("POST /api/document/open", s.handleDocumentOpen)
 	s.mux.HandleFunc("POST /api/document/select", s.handleDocumentSelect)
 	s.mux.HandleFunc("GET /api/document/sequence", s.handleSequence)
+	s.mux.HandleFunc("GET /api/topology", s.handleTopology)
+	s.mux.HandleFunc("GET /api/protter", s.handleProtterProxy)
 	s.mux.HandleFunc("GET /ws", s.hub.ServeWS)
 
 	// Phase 2 stubs.
