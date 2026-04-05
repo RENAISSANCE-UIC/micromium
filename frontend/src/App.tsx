@@ -254,7 +254,7 @@ export default function App() {
       ) : (
         /* Splash screen */
         <div style={splashStyle}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>🧬</div>
+          <img src="/logo.png" alt="Micromium" style={{ width: 120, height: 120, marginBottom: 16, objectFit: 'contain' }} />
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: 'var(--text)' }}>
             Open a plasmid file to begin
           </div>
